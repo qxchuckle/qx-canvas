@@ -1,0 +1,20 @@
+{
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "modules": false
+      }
+    ],
+    "@babel/preset-typescript"
+  ],
+  "plugins": [
+    "@babel/plugin-external-helpers",
+    [
+      "@babel/plugin-transform-runtime",
+      {
+        "useESModules": false
+      }
+    ]
+  ]
+}
