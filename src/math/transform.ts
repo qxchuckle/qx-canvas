@@ -118,12 +118,4 @@ export class Transform {
     this.updateLocalMatrix();
     this.updateWorldMatrix(parentTransform);
   }
-
-  // 对某个点应用当前变换
-  applyPoint(p: Point) {
-    const { x, y } = p;
-    p.x = x * this.localMatrix.a + y * this.localMatrix.c + this.localMatrix.tx;
-    p.y = x * this.localMatrix.b + y * this.localMatrix.d + this.localMatrix.ty;
-    return p;
-  }
 }

@@ -1,5 +1,5 @@
 const defaultStyle = {
-  color: "#ffffff",
+  color: "#000",
   alpha: 1,
   visible: false,
 };

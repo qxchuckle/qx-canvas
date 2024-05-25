@@ -17,6 +17,9 @@ a.transform.scale.set(2, 2);
 const b = new RollupDemo.Graphics().beginFill().drawRect(200, 50, 100, 100);
 b.transform.rotate = 45 * (Math.PI / 180);
 b.transform.pivot.set(200, 50);
+b.addEventListener("mousemove", (e) => {
+  console.log(e);
+});
 
 a.add(b);
 

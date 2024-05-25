@@ -3,7 +3,7 @@ import { Node } from "./node";
 
 export class Group extends Node {
   // 子节点列表
-  protected children: Group[] = [];
+  public children: Group[] = [];
 
   // 渲染自身，及其子节点
   public renderCanvas(renderer: CanvasRenderer) {

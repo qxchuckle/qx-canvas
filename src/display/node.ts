@@ -1,8 +1,12 @@
-import { Cursor } from "../types";
+import { Cursor, EventType, EventListener, EventOptions } from "../types";
 import { Point, Transform } from "../math";
 import { Group } from "./group";
 import { Shape } from "../shapes";
+import Eventemitter from "eventemitter3";
 
+const EE = new Eventemitter();
+
+// 节点基类，所有节点都继承自该类，节点直接继承自 EventEmitter，实现事件机制
 export abstract class Node {
   public visible = true; // 是否可见
   public alpha = 1; // 透明度
@@ -13,7 +17,7 @@ export abstract class Node {
   public cursor: Cursor = "auto"; // 鼠标样式
   public hitArea: Shape | null = null; // 节点图形、碰撞区域
   protected sorted = false; // 记录是否已按照 zIndex 排序
-  protected abstract children: Node[]; // 子节点
+  abstract children: Node[]; // 子节点
 
   get zIndex(): number {
     return this._zIndex;
@@ -57,11 +61,58 @@ export abstract class Node {
     }
   }
 
-  public addEventListener() {
-    // todo
+  once(type: string, listener: EventListener) {
+    EE.once(type, listener);
   }
 
-  public removeEventListener() {
-    // todo
+  on(type: string, listener: EventListener) {
+    EE.on(type, listener);
+  }
+
+  off(type: string, listener: EventListener) {
+    EE.off(type, listener);
+  }
+
+  emit(type: string, ...args: any[]) {
+    EE.emit(type, ...args);
+  }
+
+  // 绑定事件监听器
+  public addEventListener(
+    type: EventType,
+    listener: EventListener,
+    options?: boolean | EventOptions
+  ) {
+    const opts = this.analyzeEventOptions(options);
+    // 根据捕获或冒泡，获取实际的内部事件类型
+    const realType = opts.capture ? `${type}_capture` : `${type}_bubble`;
+    if (opts.once) {
+      this.once(realType, listener);
+    } else {
+      this.on(realType, listener);
+    }
+  }
+
+  // 移除事件监听器
+  public removeEventListener(
+    type: EventType,
+    listener: EventListener,
+    capture?: boolean
+  ) {
+    const realType = capture ? `${type}_capture` : `${type}_bubble`;
+    this.off(realType, listener);
+  }
+
+  private analyzeEventOptions(options?: boolean | EventOptions): EventOptions {
+    if (typeof options === "boolean") {
+      return {
+        capture: options,
+        once: false,
+      };
+    }
+    return {
+      capture: options?.capture ?? false,
+      once: options?.once ?? false,
+    };
   }
 }

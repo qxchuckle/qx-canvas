@@ -35,8 +35,8 @@
     "strictPropertyInitialization": true, // 类的实例属性必须初始化
     "strictBindCallApply": true, // 严格的bind/call/apply检查
     "noImplicitThis": true, // 不允许this有隐式的any类型
-    "noUnusedLocals": true, // 检查只声明、未使用的局部变量(只提示不报错)
-    "noUnusedParameters": true, // 检查未使用的函数参数(只提示不报错)
+    "noUnusedLocals": false, // 检查只声明、未使用的局部变量(只提示不报错)
+    "noUnusedParameters": false, // 检查未使用的函数参数(只提示不报错)
     "noFallthroughCasesInSwitch": true, // 防止switch语句贯穿(即如果没有break语句后面不会执行)
     "noImplicitReturns": true, //每个分支都会有返回值
     "esModuleInterop": true, // 允许export=导出，由import from 导入

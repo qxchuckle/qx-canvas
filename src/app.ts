@@ -1,6 +1,7 @@
 import { IAppOptions } from "./types";
 import { Renderer, CanvasRenderer } from "./renderer";
 import { Group } from "./display/group";
+import { EventSystem } from "./events";
 
 export class App {
   // renderer 是实际具有绘制能力的对象
@@ -8,14 +9,17 @@ export class App {
   private options: Required<IAppOptions>;
   // 根节点 stage 也是一个组
   public stage: Group = new Group();
+  // 事件系统
+  private eventSystem: EventSystem;
 
   constructor(options: IAppOptions) {
     this.options = {
       canvas: options.canvas,
-      backgroundColor: options.backgroundColor ?? "#000",
+      backgroundColor: options.backgroundColor ?? "#fff",
       backgroundAlpha: options.backgroundAlpha ?? 1,
     };
     this.renderer = new CanvasRenderer(this.options);
+    this.eventSystem = new EventSystem(this.options.canvas, this.stage);
     this.init();
   }
 
