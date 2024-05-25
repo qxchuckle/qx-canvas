@@ -41,4 +41,20 @@ export class EventObject {
     // 但这可能导致一些问题，比如 CSS 变换导致无法获取到正确的值，但总体还是可以满足需求
     this.global.set(nativeEvent.offsetX, nativeEvent.offsetY);
   }
+
+  // 克隆事件对象
+  public clone() {
+    const event = new EventObject();
+    event.isTrusted = this.isTrusted;
+    event.timeStamp = this.timeStamp;
+    event.type = this.type;
+    event.button = this.button;
+    event.buttons = this.buttons;
+    event.global = this.global.clone();
+    event.propagationStopped = this.propagationStopped;
+    event.eventPhase = this.eventPhase;
+    event.target = this.target;
+    event.currentTarget = this.currentTarget;
+    return event;
+  }
 }

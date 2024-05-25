@@ -1,23 +1,20 @@
 import { Cursor, EventType, EventListener, EventOptions } from "../types";
 import { Point, Transform } from "../math";
-import { Group } from "./group";
 import { Shape } from "../shapes";
 import Eventemitter from "eventemitter3";
 
-const EE = new Eventemitter();
-
 // 节点基类，所有节点都继承自该类，节点直接继承自 EventEmitter，实现事件机制
-export abstract class Node {
+export abstract class Node extends Eventemitter {
   public visible = true; // 是否可见
-  public alpha = 1; // 透明度
-  public worldAlpha = 1; // 世界透明度，由父节点透明度计算得到
-  public _zIndex = 0; // 层级
+  protected alpha = 1; // 透明度
+  protected worldAlpha = 1; // 世界透明度，由父节点透明度计算得到
+  private _zIndex = 0; // 层级
   public transform = new Transform(); // 变换对象
-  public parent: Group | null = null; // 父节点
   public cursor: Cursor = "auto"; // 鼠标样式
   public hitArea: Shape | null = null; // 节点图形、碰撞区域
   protected sorted = false; // 记录是否已按照 zIndex 排序
-  abstract children: Node[]; // 子节点
+  abstract parent: Node | null; // 父节点
+  abstract readonly children: Node[]; // 子节点
 
   get zIndex(): number {
     return this._zIndex;
@@ -30,8 +27,52 @@ export abstract class Node {
     this.parent && (this.parent.sorted = false);
   }
 
+  // 封装修改属性值的函数，返回 this，方便链式调用
+  setZIndex(index: number) {
+    this.zIndex = index;
+    return this;
+  }
+  setAlpha(alpha: number) {
+    this.alpha = alpha;
+    return this;
+  }
+  setVisible(visible: boolean) {
+    this.visible = visible;
+    return this;
+  }
+  setCursor(cursor: Cursor) {
+    this.cursor = cursor;
+    return this;
+  }
+  setHitArea(hitArea: Shape) {
+    this.hitArea = hitArea;
+    return this;
+  }
+
+  // 提供 transform 的快捷访问方法
+  setScale(x: number, y: number) {
+    this.transform.scale.set(x, y);
+    return this;
+  }
+  setRotation(rotation: number) {
+    this.transform.rotate = rotation;
+    return this;
+  }
+  setPosition(x: number, y: number) {
+    this.transform.position.set(x, y);
+    return this;
+  }
+  setPivot(x: number, y: number) {
+    this.transform.pivot.set(x, y);
+    return this;
+  }
+  setSkew(x: number, y: number) {
+    this.transform.skew.set(x, y);
+    return this;
+  }
+
   // 根据 zIndex 从小到大排序，保证层级越高的节点越后渲染
-  public sort() {
+  protected sort() {
     if (this.sorted) return;
     this.children.sort((a, b) => a.zIndex - b.zIndex);
     this.sorted = true;
@@ -59,22 +100,6 @@ export abstract class Node {
     for (let i = 0; i < this.children.length; i++) {
       this.children[i].updateTransform();
     }
-  }
-
-  once(type: string, listener: EventListener) {
-    EE.once(type, listener);
-  }
-
-  on(type: string, listener: EventListener) {
-    EE.on(type, listener);
-  }
-
-  off(type: string, listener: EventListener) {
-    EE.off(type, listener);
-  }
-
-  emit(type: string, ...args: any[]) {
-    EE.emit(type, ...args);
   }
 
   // 绑定事件监听器

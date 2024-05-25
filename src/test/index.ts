@@ -17,10 +17,12 @@ a.transform.scale.set(2, 2);
 const b = new RollupDemo.Graphics().beginFill().drawRect(200, 50, 100, 100);
 b.transform.rotate = 45 * (Math.PI / 180);
 b.transform.pivot.set(200, 50);
-b.addEventListener("mousemove", (e) => {
-  console.log(e);
+b.addEventListener("click", (e) => {
+  console.log(e.clone());
 });
+
+a.setAlpha(0.6);
 
 a.add(b);
 
-app.stage.add(a);
+app.stage.add(a).setCursor("pointer");

@@ -2,8 +2,9 @@ import { CanvasRenderer } from "../renderer";
 import { Node } from "./node";
 
 export class Group extends Node {
+  public parent: Group | null = null;
   // 子节点列表
-  public children: Group[] = [];
+  public readonly children: Group[] = [];
 
   // 渲染自身，及其子节点
   public renderCanvas(renderer: CanvasRenderer) {
@@ -20,7 +21,7 @@ export class Group extends Node {
 
   // 渲染自身
   // 子元素应该重写或继续扩展这个方法以绘制图形
-  public renderSelf(renderer: CanvasRenderer) {
+  protected renderSelf(renderer: CanvasRenderer) {
     renderer.ctx.save();
     this.applyTransform(renderer);
     renderer.ctx.restore();
@@ -58,9 +59,39 @@ export class Group extends Node {
     return this;
   }
 
+  // 清空子节点
+  public removeChildren() {
+    this.children.length = 0;
+    return this;
+  }
+
+  // 移除自身
+  public removeSelf() {
+    this.parent?.remove(this);
+    return this;
+  }
+
+  // 销毁
+  public destroy() {
+    this.removeChildren();
+    this.removeSelf();
+  }
+
   // 应用变换
-  public applyTransform(renderer: CanvasRenderer) {
+  protected applyTransform(renderer: CanvasRenderer) {
     const { a, b, c, d, tx, ty } = this.transform.worldMatrix;
     renderer.ctx.setTransform(a, b, c, d, tx, ty);
+  }
+
+  // 获取传播路径
+  getSpreadPath() {
+    const res: Group[] = [];
+    let target: Group | null = this;
+    while (target) {
+      res.push(target);
+      // 如果节点有父节点，则继续向上查找
+      target = target.parent;
+    }
+    return res.reverse();
   }
 }

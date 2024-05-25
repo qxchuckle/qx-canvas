@@ -5,10 +5,10 @@ import { EventSystem } from "./events";
 
 export class App {
   // renderer 是实际具有绘制能力的对象
-  public renderer: Renderer;
+  private renderer: Renderer;
   private options: Required<IAppOptions>;
   // 根节点 stage 也是一个组
-  public stage: Group = new Group();
+  public readonly stage: Group = new Group();
   // 事件系统
   private eventSystem: EventSystem;
 
@@ -32,5 +32,14 @@ export class App {
   private render() {
     this.renderer.render(this.stage);
     requestAnimationFrame(this.render.bind(this));
+  }
+
+  // 清空舞台
+  clear() {
+    this.stage.removeChildren();
+  }
+
+  resize(width: number, height: number) {
+    this.renderer.resize(width, height);
   }
 }

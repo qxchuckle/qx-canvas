@@ -8,13 +8,13 @@ import { Point } from "../math";
 // Graphics 类包含一组用于创建各种形状的方法。
 export class Graphics extends Group {
   // 图形数据列表
-  graphicsDataArr: GraphicsData[] = [];
+  private graphicsDataArr: GraphicsData[] = [];
   // 当前图形样式
-  fillStyle: FillStyle = new FillStyle();
-  lineStyle: LineStyle = new LineStyle();
+  private fillStyle: FillStyle = new FillStyle();
+  private lineStyle: LineStyle = new LineStyle();
 
   // 渲染自身
-  public renderSelf(renderer: CanvasRenderer) {
+  protected renderSelf(renderer: CanvasRenderer) {
     const ctx = renderer.ctx;
     ctx.save();
     // 应用变换
@@ -70,6 +70,8 @@ export class Graphics extends Group {
 
   // 碰撞检测
   public contains(p: Point): boolean {
+    // 对点进行逆变换
+    p = this.transform.worldMatrix.applyInverse(p);
     // 如果有自定义的碰撞区域，直接判断
     if (this.hitArea) {
       return this.hitArea.contains(p);

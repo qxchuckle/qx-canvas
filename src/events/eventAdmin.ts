@@ -107,6 +107,7 @@ export class EventAdmin {
 
     // 处理 mousemove 事件
     if (hitTarget) {
+      !hitPath && (hitPath = this.spreadPath(hitTarget));
       e.target = hitTarget;
       e.type = "mousemove";
       this.dispatchEvent(e);
@@ -114,8 +115,16 @@ export class EventAdmin {
 
     // 更新悬浮目标
     this.overTargets = hitPath ?? [];
+
     // 更新鼠标样式
-    this.cursor = hitTarget?.cursor ?? "auto";
+    // 从悬浮目标根元素开始找到首个不为 auto 的 cursor，实现继承 cursor 的效果
+    this.cursor = "auto";
+    for (let i = this.overTargets.length - 1; i >= 0; i--) {
+      this.cursor = this.overTargets[i].cursor;
+      if (this.cursor !== "auto") {
+        break;
+      }
+    }
   };
 
   // 鼠标按下事件处理函数
@@ -202,22 +211,14 @@ export class EventAdmin {
       }
     }
     // 检测当前节点是否碰撞
-    // 对全局坐标进行变换
-    const tp = curTarget.transform.worldMatrix.applyInverse(p);
-    if (curTarget.contains(tp)) {
+    if (curTarget.contains(p)) {
       this.hitTarget = curTarget;
     }
   };
 
   // 获取事件的传播路径，从目标节点到根节点
   private spreadPath = (target: Group | null) => {
-    const res: Group[] = [];
-    while (target) {
-      res.unshift(target);
-      // 如果节点有父节点，则继续向上查找
-      target = target.parent;
-    }
-    return res;
+    return target?.getSpreadPath() ?? [];
   };
 
   // 派发事件

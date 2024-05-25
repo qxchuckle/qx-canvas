@@ -1,4 +1,4 @@
 // 核心App
-export * from "./app";
+export { App } from "./app";
 // 绘制图形
-export * from "./graphics";
+export { Graphics } from "./graphics";

@@ -1,21 +1,21 @@
 import { Matrix } from "./matrix";
-import { ObservablePoint, Point } from "./point";
+import { ObservablePoint } from "./point";
 
 // 变换矩阵的封装类
 export class Transform {
-  public localMatrix = new Matrix(); // 相对于父节点的变换矩阵，但注意坐标系仍然是画布
+  private localMatrix = new Matrix(); // 相对于父节点的变换矩阵，但注意坐标系仍然是画布
   public worldMatrix = new Matrix(); // 累加了父变换矩阵后，实际相对于世界坐标系的变换矩阵
   public position: ObservablePoint; // 位置，影响平移，即 tx, ty
   public pivot: ObservablePoint; // 旋转锚点，影响旋转，即 a, b, c, d
   public scale: ObservablePoint; // 缩放
   public skew: ObservablePoint; // 斜切
-  public _rotate = 0; // 旋转角度，弧度制
+  private _rotate = 0; // 旋转角度，弧度制
   private rotateMatrix = new Matrix(); // 旋转矩阵
   private skewMatrix = new Matrix(); // 斜切矩阵
   private scaleMatrix = new Matrix(); // 缩放矩阵
 
-  public shouldUpdateLocalMatrix = false; // 是否需要更新 localMatrix
-  public parentID = ""; // 父节点的 ID
+  private shouldUpdateLocalMatrix = false; // 是否需要更新 localMatrix
+  private parentID = ""; // 父节点的 ID
 
   constructor() {
     this.position = new ObservablePoint(this.onChange);
