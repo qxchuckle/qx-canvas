@@ -4,10 +4,10 @@ import { Group } from "./display/group";
 
 export class App {
   // renderer 是实际具有绘制能力的对象
-  private renderer: Renderer;
+  public renderer: Renderer;
   private options: Required<IAppOptions>;
   // 根节点 stage 也是一个组
-  private stage: Group = new Group();
+  public stage: Group = new Group();
 
   constructor(options: IAppOptions) {
     this.options = {

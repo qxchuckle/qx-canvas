@@ -3,7 +3,7 @@ import { Node } from "./node";
 
 export class Group extends Node {
   // 子节点列表
-  children: Group[] = [];
+  protected children: Group[] = [];
 
   // 渲染自身，及其子节点
   public renderCanvas(renderer: CanvasRenderer) {
@@ -21,7 +21,9 @@ export class Group extends Node {
   // 渲染自身
   // 子元素应该重写或继续扩展这个方法以绘制图形
   public renderSelf(renderer: CanvasRenderer) {
+    renderer.ctx.save();
     this.applyTransform(renderer);
+    renderer.ctx.restore();
     return this;
   }
 

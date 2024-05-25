@@ -12,6 +12,7 @@ export class CanvasRenderer extends Renderer {
   }
 
   render(stage: Group): void {
+    stage.updateTransform();
     this.renderBackground();
     // 渲染根节点
     stage.renderCanvas(this);

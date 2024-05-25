@@ -1,6 +1,8 @@
+import { CanvasRenderer } from "../renderer";
 import { Point } from "../math";
 import { ShapeType } from "../types";
 import { Shape } from "./shape";
+import { GraphicsData } from "../graphics";
 
 // 矩形
 export class Rectangle extends Shape {
@@ -30,6 +32,18 @@ export class Rectangle extends Shape {
       return true;
     } else {
       return false;
+    }
+  }
+
+  render(renderer: CanvasRenderer, data: GraphicsData) {
+    const ctx = renderer.ctx;
+    const fillStyle = data.fillStyle;
+    const lineStyle = data.lineStyle;
+    if (fillStyle.visible) {
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+    }
+    if (lineStyle.visible) {
+      ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
   }
 }

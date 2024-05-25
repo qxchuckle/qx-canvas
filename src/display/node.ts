@@ -13,7 +13,7 @@ export abstract class Node {
   public cursor: Cursor = "auto"; // 鼠标样式
   public hitArea: Shape | null = null; // 节点图形、碰撞区域
   protected sorted = false; // 记录是否已按照 zIndex 排序
-  abstract children: Node[]; // 子节点
+  protected abstract children: Node[]; // 子节点
 
   get zIndex(): number {
     return this._zIndex;

@@ -1,5 +1,5 @@
 import { Matrix } from "./matrix";
-import { ObservablePoint } from "./point";
+import { ObservablePoint, Point } from "./point";
 
 // 变换矩阵的封装类
 export class Transform {
@@ -33,13 +33,13 @@ export class Transform {
   }
 
   // 设置旋转角度时，更新旋转矩阵
-  set rotation(r: number) {
+  set rotate(r: number) {
     this._rotate = r;
     this.rotateMatrix.set(
-      Math.cos(this.rotation),
-      Math.sin(this.rotation),
-      -Math.sin(this.rotation),
-      Math.cos(this.rotation),
+      Math.cos(this.rotate),
+      Math.sin(this.rotate),
+      -Math.sin(this.rotate),
+      Math.cos(this.rotate),
       0,
       0
     );
@@ -117,5 +117,13 @@ export class Transform {
   updateTransform(parentTransform: Transform) {
     this.updateLocalMatrix();
     this.updateWorldMatrix(parentTransform);
+  }
+
+  // 对某个点应用当前变换
+  applyPoint(p: Point) {
+    const { x, y } = p;
+    p.x = x * this.localMatrix.a + y * this.localMatrix.c + this.localMatrix.tx;
+    p.y = x * this.localMatrix.b + y * this.localMatrix.d + this.localMatrix.ty;
+    return p;
   }
 }
