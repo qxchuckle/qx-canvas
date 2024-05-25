@@ -2,6 +2,7 @@ import { IAppOptions } from "./types";
 import { Renderer, CanvasRenderer } from "./renderer";
 import { Group } from "./display/group";
 import { EventSystem } from "./events";
+import { Rectangle } from "./shapes";
 
 export class App {
   // renderer 是实际具有绘制能力的对象
@@ -25,6 +26,10 @@ export class App {
 
   // 初始化
   private init() {
+    // 将舞台的碰撞区域设置为整个画布
+    this.stage.setHitArea(
+      new Rectangle(0, 0, this.renderer.width, this.renderer.height)
+    );
     this.render();
   }
 

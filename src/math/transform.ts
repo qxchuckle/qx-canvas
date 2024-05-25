@@ -1,3 +1,4 @@
+import { matrixMultiply } from "../utils";
 import { Matrix } from "./matrix";
 import { ObservablePoint } from "./point";
 
@@ -46,9 +47,9 @@ export class Transform {
     this.shouldUpdateLocalMatrix = true;
   }
 
-  private onChange() {
+  private onChange = () => {
     this.shouldUpdateLocalMatrix = true;
-  }
+  };
 
   private onScaleChange = (scaleX: number, scaleY: number) => {
     this.scaleMatrix.set(scaleX, 0, 0, scaleY, 0, 0);
@@ -68,7 +69,7 @@ export class Transform {
   };
 
   // 更新 localMatrix 相对于父节点的变换矩阵
-  updateLocalMatrix() {
+  private updateLocalMatrix() {
     if (!this.shouldUpdateLocalMatrix) {
       return;
     }
@@ -99,14 +100,15 @@ export class Transform {
   }
 
   // 更新 worldMatrix
-  updateWorldMatrix(parentTransform: Transform) {
+  private updateWorldMatrix(parentTransform: Transform) {
     // 如果父节点的变换没有变化，直接返回
     if (this.parentID === parentTransform.wordID) {
       return;
     }
     // localMatrix 左乘父元素的 worldMatrix，得到当前节点的 worldMatrix
-    const { a, b, c, d, tx, ty } = this.localMatrix.prepend(
-      parentTransform.worldMatrix
+    const { a, b, c, d, tx, ty } = matrixMultiply(
+      parentTransform.worldMatrix,
+      this.localMatrix
     );
     this.worldMatrix.set(a, b, c, d, tx, ty);
     // 更新完毕，记录最新父节点的 ID

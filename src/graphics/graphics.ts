@@ -8,7 +8,9 @@ import { Point } from "../math";
 // Graphics 类包含一组用于创建各种形状的方法。
 export class Graphics extends Group {
   // 图形数据列表
-  private graphicsDataArr: GraphicsData[] = [];
+  // 一个 Graphics 对象可以包含多个图形数据
+  // 若需要实现复杂操作，可以操作该列表
+  public readonly graphicsDataList: GraphicsData[] = [];
   // 当前图形样式
   private fillStyle: FillStyle = new FillStyle();
   private lineStyle: LineStyle = new LineStyle();
@@ -20,8 +22,8 @@ export class Graphics extends Group {
     // 应用变换
     this.applyTransform(renderer);
     // 遍历图形数据列表，渲染图形
-    for (let i = 0; i < this.graphicsDataArr.length; i++) {
-      const data = this.graphicsDataArr[i];
+    for (let i = 0; i < this.graphicsDataList.length; i++) {
+      const data = this.graphicsDataList[i];
       ctx.save();
       // 设置样式
       if (data.fillStyle.visible) {
@@ -58,14 +60,14 @@ export class Graphics extends Group {
   }
 
   // 绘制形状
-  private drawShape(
-    shape: Shape,
-    fillStyle: FillStyle,
-    lineStyle: LineStyle
-  ): void {
+  private drawShape(shape: Shape): void {
     // 记录此时的样式信息
-    const data = new GraphicsData(shape, fillStyle, lineStyle);
-    this.graphicsDataArr.push(data);
+    const data = new GraphicsData(
+      shape,
+      this.fillStyle.clone(),
+      this.lineStyle.clone()
+    );
+    this.graphicsDataList.push(data);
   }
 
   // 碰撞检测
@@ -77,8 +79,8 @@ export class Graphics extends Group {
       return this.hitArea.contains(p);
     }
     // 遍历图形数据列表，判断点是否在图形内
-    for (let i = 0; i < this.graphicsDataArr.length; i++) {
-      const data = this.graphicsDataArr[i];
+    for (let i = 0; i < this.graphicsDataList.length; i++) {
+      const data = this.graphicsDataList[i];
       // 只有填充的形状才进行碰撞检测
       if (data.fillStyle.visible && data.shape.contains(p)) {
         return true;
@@ -89,11 +91,7 @@ export class Graphics extends Group {
 
   // 绘制矩形
   public drawRect(x: number, y: number, width: number, height: number) {
-    this.drawShape(
-      new Rectangle(x, y, width, height),
-      this.fillStyle.clone(),
-      this.lineStyle.clone()
-    );
+    this.drawShape(new Rectangle(x, y, width, height));
     return this;
   }
 }

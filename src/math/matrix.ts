@@ -1,3 +1,4 @@
+import { matrixMultiply } from "../utils";
 import { Point } from "./point";
 
 // 变换矩阵类，包含一些矩阵的基本方法
@@ -28,27 +29,18 @@ export class Matrix {
     return this;
   }
 
-  // 两个矩阵相乘，并将结果赋值给当前矩阵
-  private multiply(m1: Matrix, m2: Matrix) {
-    const { a: a0, b: b0, c: c0, d: d0, tx: tx0, ty: ty0 } = m1;
-    const { a: a1, b: b1, c: c1, d: d1, tx: tx1, ty: ty1 } = m2;
-    this.a = a0 * a1 + c0 * b1;
-    this.b = b0 * a1 + d0 * b1;
-    this.c = a0 * c1 + c0 * d1;
-    this.d = b0 * c1 + d0 * d1;
-    this.tx = a0 * tx1 + c0 * ty1 + tx0;
-    this.ty = b0 * tx1 + d0 * ty1 + ty0;
-    return this;
-  }
-
   // 将当前矩阵右乘一个矩阵
   public append(m: Matrix) {
-    return this.multiply(this, m);
+    const { a, b, c, d, tx, ty } = matrixMultiply(this, m);
+    this.set(a, b, c, d, tx, ty);
+    return this;
   }
 
   // 将当前矩阵左乘一个矩阵
   public prepend(m: Matrix) {
-    return this.multiply(m, this);
+    const { a, b, c, d, tx, ty } = matrixMultiply(m, this);
+    this.set(a, b, c, d, tx, ty);
+    return this;
   }
 
   // 对传入的点应用当前矩阵变换，返回变换后的新点

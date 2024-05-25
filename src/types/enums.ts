@@ -23,8 +23,8 @@ export enum LINE_JOIN {
 
 // 事件阶段
 export enum EventPhase {
-  NONE = 0, // 无阶段
-  CAPTURING = 1, // 捕获阶段
-  AT_TARGET = 2, // 目标阶段
-  BUBBLING = 3, // 冒泡阶段
+  NONE = "none", // 无阶段
+  CAPTURING = "capturing", // 捕获阶段
+  AT_TARGET = "atTarget", // 目标阶段
+  BUBBLING = "bubbling", // 冒泡阶段
 }
