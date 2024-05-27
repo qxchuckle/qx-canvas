@@ -92,7 +92,7 @@ export class Path extends Shape {
     }
     this.state[index].closePath = closePath;
     this.lastStateIndex = index;
-    console.log(this.state);
+    // console.log(this.state);
   }
 
   pushClosePath() {

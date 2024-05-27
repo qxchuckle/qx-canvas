@@ -2,9 +2,10 @@ import { Cursor, EventType, EventListener, EventOptions } from "../types";
 import { Point, Transform } from "../math";
 import { Shape } from "../shapes";
 import Eventemitter from "eventemitter3";
+import { EventClient } from "../events/eventClient";
 
-// 节点基类，所有节点都继承自该类，节点直接继承自 EventEmitter，实现事件机制
-export abstract class Node extends Eventemitter {
+// 节点基类，所有节点都继承自该类，节点直接继承自 EventClient，实现事件机制
+export abstract class Node extends EventClient {
   public visible = true; // 是否可见
   protected alpha = 1; // 透明度
   protected worldAlpha = 1; // 世界透明度，由父节点透明度计算得到
