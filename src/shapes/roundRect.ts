@@ -81,7 +81,7 @@ export class RoundRect extends Shape {
     return true;
   }
 
-  render(renderer: CanvasRenderer, data: GraphicsData) {
+  render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number) {
     const ctx = renderer.ctx;
     ctx.roundRect(this.x, this.y, this.width, this.height, this.radius);
     const fillStyle = data.fillStyle;

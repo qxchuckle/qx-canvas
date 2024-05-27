@@ -27,7 +27,7 @@ export class Ellipse extends Shape {
     );
   }
 
-  public render(renderer: CanvasRenderer, data: GraphicsData): void {
+  public render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number): void {
     const ctx = renderer.ctx;
     const fillStyle = data.fillStyle;
     const lineStyle = data.lineStyle;

@@ -8,7 +8,7 @@ export abstract class Shape {
   // 图形类型
   public abstract readonly type: ShapeType;
   // 渲染图形
-  public abstract render(renderer: CanvasRenderer, data: GraphicsData): void;
+  public abstract render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number): void;
   // 判断点是否在图形内
   public abstract contains(p: Point): boolean;
 }

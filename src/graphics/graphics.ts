@@ -5,6 +5,7 @@ import {
   Ellipse,
   RoundRect,
   Polygon,
+  Path,
 } from "../shapes";
 import { Group } from "../display/group";
 import { CanvasRenderer } from "../renderer";
@@ -21,6 +22,13 @@ export class Graphics extends Group {
   // 当前图形样式
   private fillStyle: FillStyle = new FillStyle();
   private lineStyle: LineStyle = new LineStyle();
+  // 除了能绘制各种图形外，本身也可以自由绘制
+  private currentPath = new Path();
+
+  constructor() {
+    super();
+    this.drawShape(this.currentPath);
+  }
 
   // 渲染自身
   protected renderSelf(renderer: CanvasRenderer) {
@@ -45,8 +53,7 @@ export class Graphics extends Group {
         ctx.strokeStyle = data.lineStyle.color;
         ctx.globalAlpha = data.lineStyle.alpha * this.worldAlpha;
       }
-      // 渲染图形
-      data.shape.render(renderer, data);
+      data.shape.render(renderer, data, this.worldAlpha);
       ctx.restore();
     }
     ctx.restore();
@@ -57,6 +64,7 @@ export class Graphics extends Group {
   public beginFill(style: Partial<FillStyleType> = {}) {
     this.fillStyle.set(style);
     this.fillStyle.visible = style.visible ?? true;
+    this.currentPath.pushState(this.fillStyle.clone());
     return this;
   }
 
@@ -64,6 +72,7 @@ export class Graphics extends Group {
   public beginLine(style: Partial<LineStyleType & FillStyleType> = {}) {
     this.lineStyle.set(style);
     this.lineStyle.visible = style.visible ?? true;
+    this.currentPath.pushState(this.lineStyle.clone());
     return this;
   }
 
@@ -130,6 +139,39 @@ export class Graphics extends Group {
   // 绘制多边形
   public drawPolygon(points: number[]) {
     this.drawShape(new Polygon(points, true));
+    return this;
+  }
+
+  // 移动画笔
+  moveTo(x: number, y: number) {
+    // 获取路径最后一个点，判断是否为 NaN
+    const points = this.currentPath.points;
+    const len = points.length;
+    if (len > 1) {
+      const lastX = points[len - 2];
+      const lastY = points[len - 1];
+      // 如果上一个点和当前点相同，则不添加
+      if (lastX === x && lastY === y) {
+        return this;
+      }
+      // 如果上一个点不为NaN，则添加一个NaN，作为move分割
+      if (!Number.isNaN(lastX) && !Number.isNaN(lastY)) {
+        this.currentPath.pushPoint(NaN, NaN);
+      }
+    }
+    this.currentPath.pushPoint(x, y);
+    return this;
+  }
+
+  // 画线
+  lineTo(x: number, y: number) {
+    this.currentPath.pushPoint(x, y);
+    return this;
+  }
+
+  // 闭合路径
+  closePath() {
+    this.currentPath.pushClosePath();
     return this;
   }
 }

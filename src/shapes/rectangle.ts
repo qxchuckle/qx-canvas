@@ -35,7 +35,7 @@ export class Rectangle extends Shape {
     }
   }
 
-  render(renderer: CanvasRenderer, data: GraphicsData) {
+  render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number) {
     const ctx = renderer.ctx;
     const fillStyle = data.fillStyle;
     const lineStyle = data.lineStyle;

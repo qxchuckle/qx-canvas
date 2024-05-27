@@ -9,8 +9,8 @@ import { isIntersect } from "../utils";
 export class Polygon extends Shape {
   public readonly type = ShapeType.Polygon;
   // 多边形的顶点，每两个元素组成一个点
-  public points: number[];
-  public closePath: boolean;
+  private points: number[];
+  private closePath: boolean;
 
   constructor(points: number[], closePath: boolean = false) {
     super();
@@ -59,7 +59,11 @@ export class Polygon extends Shape {
     }
   }
 
-  render(renderer: CanvasRenderer, data: GraphicsData): void {
+  render(
+    renderer: CanvasRenderer,
+    data: GraphicsData,
+    worldAlpha: number
+  ): void {
     const ctx = renderer.ctx;
     const fillStyle = data.fillStyle;
     const lineStyle = data.lineStyle;

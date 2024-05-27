@@ -4,3 +4,4 @@ export * from "./circle";
 export * from "./ellipse";
 export * from "./roundRect";
 export * from "./polygon";
+export * from "./path";
