@@ -1,5 +1,5 @@
 .git
 node_modules
 .rollup.cache
-dist
 extractedCode.txt
+dev

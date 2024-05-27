@@ -1,8 +1,8 @@
-import terser from "@rollup/plugin-terser";
-import { babel } from "@rollup/plugin-babel";
 import common from "./rollup.config.common.mjs";
 import { name } from "./config.mjs";
 import dts from "rollup-plugin-dts";
+import clear from "rollup-plugin-clear";
+import typescript from "@rollup/plugin-typescript";
 
 export default [
   Object.assign({}, common, {
@@ -13,13 +13,6 @@ export default [
         format: "umd",
         name,
       },
-      // {
-      //   dir: "dist",
-      //   entryFileNames: "[name].min.js",
-      //   format: "umd",
-      //   name,
-      //   plugins: [terser()],
-      // },
       {
         dir: "dist",
         entryFileNames: "[name].cjs.js",
@@ -33,11 +26,14 @@ export default [
     ],
     plugins: [
       ...common.plugins,
-      // babel({
-      //   exclude: "**/node_modules/**",
-      //   babelHelpers: "runtime",
-      //   extensions: [".js", ".ts"],
-      // }),
+      typescript({
+        compilerOptions: {
+          outDir: "./dist",
+        },
+      }),
+      clear({
+        targets: ["dist"],
+      }),
     ],
   }),
   {
