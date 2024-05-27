@@ -1,4 +1,11 @@
-import { Rectangle, Shape } from "../shapes";
+import {
+  Rectangle,
+  Shape,
+  Circle,
+  Ellipse,
+  RoundRect,
+  Polygon,
+} from "../shapes";
 import { Group } from "../display/group";
 import { CanvasRenderer } from "../renderer";
 import { GraphicsData } from "./graphicsData";
@@ -25,6 +32,7 @@ export class Graphics extends Group {
     for (let i = 0; i < this.graphicsDataList.length; i++) {
       const data = this.graphicsDataList[i];
       ctx.save();
+      ctx.beginPath();
       // 设置样式
       if (data.fillStyle.visible) {
         ctx.fillStyle = data.fillStyle.color;
@@ -92,6 +100,36 @@ export class Graphics extends Group {
   // 绘制矩形
   public drawRect(x: number, y: number, width: number, height: number) {
     this.drawShape(new Rectangle(x, y, width, height));
+    return this;
+  }
+
+  // 绘制圆
+  public drawCircle(x: number, y: number, radius: number) {
+    this.drawShape(new Circle(x, y, radius));
+    return this;
+  }
+
+  // 绘制椭圆
+  public drawEllipse(x: number, y: number, radiusX: number, radiusY: number) {
+    this.drawShape(new Ellipse(x, y, radiusX, radiusY));
+    return this;
+  }
+
+  // 绘制圆角矩形
+  public drawRoundRect(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    radius: number
+  ) {
+    this.drawShape(new RoundRect(x, y, width, height, radius));
+    return this;
+  }
+
+  // 绘制多边形
+  public drawPolygon(points: number[]) {
+    this.drawShape(new Polygon(points, true));
     return this;
   }
 }

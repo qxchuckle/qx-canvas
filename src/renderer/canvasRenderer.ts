@@ -2,7 +2,7 @@ import { Group } from "../display/group";
 import { IAppOptions } from "../types";
 import { Renderer } from "./renderer";
 
-export class CanvasRenderer extends Renderer {
+export class CanvasRenderer extends Renderer<CanvasRenderingContext2D> {
   public ctx: CanvasRenderingContext2D;
 
   constructor(options: Required<IAppOptions>) {

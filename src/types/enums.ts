@@ -4,7 +4,7 @@ export enum ShapeType {
   Polygon = "polygon",
   Circle = "circle",
   Ellipse = "ellipse",
-  RoundedRectangle = "roundedRectangle",
+  RoundRect = "roundRect",
 }
 
 // 线条端点样式，对应 lineCap 属性

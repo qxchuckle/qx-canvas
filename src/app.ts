@@ -1,12 +1,12 @@
-import { IAppOptions } from "./types";
+import { IAppOptions, IContext } from "./types";
 import { Renderer, CanvasRenderer } from "./renderer";
 import { Group } from "./display/group";
 import { EventSystem } from "./events";
 import { Rectangle } from "./shapes";
 
-export class App {
+export class App<T extends IContext["ctx"] = CanvasRenderingContext2D> {
   // renderer 是实际具有绘制能力的对象
-  private renderer: Renderer;
+  private renderer: Renderer<T>;
   private options: Required<IAppOptions>;
   // 根节点 stage 也是一个组
   public readonly stage: Group = new Group();
@@ -19,7 +19,7 @@ export class App {
       backgroundColor: options.backgroundColor ?? "#fff",
       backgroundAlpha: options.backgroundAlpha ?? 1,
     };
-    this.renderer = new CanvasRenderer(this.options);
+    this.renderer = new CanvasRenderer(this.options) as unknown as Renderer<T>;
     this.eventSystem = new EventSystem(this.options.canvas, this.stage);
     this.init();
   }
@@ -44,7 +44,16 @@ export class App {
     this.stage.removeChildren();
   }
 
+  // 修改画布大小
   resize(width: number, height: number) {
     this.renderer.resize(width, height);
+  }
+
+  get ctx() {
+    return this.renderer.ctx;
+  }
+
+  get canvas() {
+    return this.options.canvas;
   }
 }

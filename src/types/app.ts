@@ -7,3 +7,13 @@ export interface IAppOptions {
   // 背景透明度
   backgroundAlpha?: number;
 }
+// context
+export interface IContext {
+  // 画布
+  canvas: HTMLCanvasElement;
+  // 画布上下文
+  ctx:
+    | CanvasRenderingContext2D
+    | WebGLRenderingContext
+    | WebGL2RenderingContext;
+}

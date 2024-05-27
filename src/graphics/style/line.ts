@@ -7,7 +7,7 @@ const defaultStyle = {
   join: LINE_JOIN.MITER,
   miterLimit: 10,
 };
-export type LineStyleType = typeof defaultStyle;
+export type LineStyleType = typeof defaultStyle & FillStyleType;
 
 export class LineStyle extends FillStyle {
   public width;
@@ -15,7 +15,7 @@ export class LineStyle extends FillStyle {
   public join;
   public miterLimit;
 
-  constructor(style: Partial<LineStyleType & FillStyleType> = {}) {
+  constructor(style: Partial<LineStyleType> = {}) {
     super(style);
     this.width = style.width ?? defaultStyle.width;
     this.cap = style.cap ?? defaultStyle.cap;
@@ -23,7 +23,7 @@ export class LineStyle extends FillStyle {
     this.miterLimit = style.miterLimit ?? defaultStyle.miterLimit;
   }
 
-  set(style: Partial<LineStyleType & FillStyleType> = {}): void {
+  set(style: Partial<LineStyleType> = {}): void {
     super.set(style);
     this.width = style.width ?? defaultStyle.width;
     this.cap = style.cap ?? defaultStyle.cap;
@@ -49,5 +49,19 @@ export class LineStyle extends FillStyle {
     this.cap = LINE_CAP.BUTT;
     this.join = LINE_JOIN.MITER;
     this.miterLimit = 10;
+  }
+
+  public isSameOf(style: LineStyleType): boolean {
+    return (
+      super.isSameOf({
+        color: style.color,
+        alpha: style.alpha,
+        visible: style.visible,
+      }) &&
+      this.width === style.width &&
+      this.cap === style.cap &&
+      this.join === style.join &&
+      this.miterLimit === style.miterLimit
+    );
   }
 }

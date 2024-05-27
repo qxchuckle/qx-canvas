@@ -1,9 +1,10 @@
-import { IAppOptions } from "../types";
+import { IAppOptions, IContext } from "../types";
 import { Group } from "../display/group";
 
-export abstract class Renderer {
-  protected canvas: HTMLCanvasElement;
+export abstract class Renderer<T extends IContext["ctx"]> {
+  protected canvas: IContext["canvas"];
   private options: Required<IAppOptions>;
+  abstract ctx: T;
 
   constructor(options: Required<IAppOptions>) {
     this.canvas = options.canvas;

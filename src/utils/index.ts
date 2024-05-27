@@ -15,3 +15,27 @@ export function matrixMultiply(m1: Matrix, m2: Matrix) {
     ty: m1.b * m2.tx + m1.d * m2.ty + m1.ty,
   };
 }
+// 判断线段与从某个点发出的水平向右的射线是否相交
+// ox, oy 是射线起点，px1, py1, px2, py2 是线段两个端点
+export function isIntersect(
+  ox: number,
+  oy: number,
+  px1: number,
+  py1: number,
+  px2: number,
+  py2: number
+) {
+  // 线段在射线下方，不可能相交
+  if (py1 < oy && py2 < oy) return false;
+  // 线段在射线上方，不可能相交
+  if (py1 > oy && py2 > oy) return false;
+  // 都在左边，不可能相交
+  if (px1 < ox && px2 < ox) return false;
+  // 都在右边，一定相交
+  if (px1 > ox && px2 > ox) return true;
+  // 到这里说明两点分布在射线对角两侧，需要计算交点 x 坐标
+  // 相似三角形法计算交点 x 坐标
+  const x = ((oy - py1) * (px2 - px1)) / (py2 - py1) + px1;
+  // 如果交点在射线右侧，返回 true
+  return x > ox;
+}
