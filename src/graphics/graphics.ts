@@ -20,8 +20,8 @@ export class Graphics extends Group {
   // 若需要实现复杂操作，可以操作该列表
   public readonly graphicsDataList: GraphicsData[] = [];
   // 当前图形样式
-  private fillStyle: FillStyle = new FillStyle();
-  private lineStyle: LineStyle = new LineStyle();
+  private readonly fillStyle: FillStyle = new FillStyle();
+  private readonly lineStyle: LineStyle = new LineStyle();
   // 除了能绘制各种图形外，本身也可以自由绘制
   private currentPath = new Path();
 
@@ -172,6 +172,23 @@ export class Graphics extends Group {
   // 闭合路径
   closePath() {
     this.currentPath.pushClosePath();
+    return this;
+  }
+
+  // 开始新路径
+  beginPath() {
+    this.currentPath = new Path();
+    this.drawShape(this.currentPath);
+    return this;
+  }
+
+  endFill() {
+    this.beginFill({ visible: false });
+    return this;
+  }
+
+  endLine() {
+    this.beginLine({ visible: false });
     return this;
   }
 }

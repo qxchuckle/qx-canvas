@@ -96,9 +96,10 @@ export class Path extends Shape {
   }
 
   pushClosePath() {
-    if (this.lastStateIndex >= 0) {
-      this.state[this.lastStateIndex].closePath = true;
-    }
+    // if (this.lastStateIndex >= 0) {
+    //   this.state[this.lastStateIndex].closePath = true;
+    // }
+    this.pushState(undefined, true);
   }
 
   // 更新当前样式
@@ -176,6 +177,11 @@ export class Path extends Shape {
     for (let i = 2; i < this.points.length; i += 2) {
       const x = this.points[i];
       const y = this.points[i + 1];
+      // 如果允许闭合路径，则关闭路径
+      if (this.closePath) {
+        this.path2D.linePath.closePath();
+        this.closePath = false;
+      }
       // 绘制路径
       if (Number.isNaN(x) || Number.isNaN(y)) {
         this.moveTo(this.points[i + 2], this.points[i + 3]);

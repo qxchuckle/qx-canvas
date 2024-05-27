@@ -160,9 +160,9 @@ const s = new RollupDemo.Graphics()
   .moveTo(100, 100)
   .lineTo(200, 200)
   .lineTo(500, 200)
+  .closePath()
   .moveTo(200, 400)
   .lineTo(500, 600)
-  .closePath()
   .beginLine({ width: 6, color: "red" })
   .beginFill({ color: "blue" })
   .moveTo(200, 50)
@@ -176,6 +176,7 @@ app.stage.add(s);
 const s1 = new RollupDemo.Graphics();
 app.stage.add(s1);
 app.stage.addEventListener("mousedown", (e) => {
+  // s1.beginPath();
   s1.beginLine({ width: 2, color: color.value });
   const onMove = (e: any) => {
     s1.lineTo(e.global.x, e.global.y);
