@@ -13,21 +13,31 @@ export default [
         format: "umd",
         name,
       },
+      // {
+      //   dir: "dist",
+      //   entryFileNames: "[name].min.js",
+      //   format: "umd",
+      //   name,
+      //   plugins: [terser()],
+      // },
       {
         dir: "dist",
-        entryFileNames: "[name].min.js",
-        format: "umd",
-        name,
-        plugins: [terser()],
+        entryFileNames: "[name].cjs.js",
+        format: "cjs",
+      },
+      {
+        dir: "dist",
+        entryFileNames: "[name].esm.js",
+        format: "es",
       },
     ],
     plugins: [
       ...common.plugins,
-      babel({
-        exclude: "**/node_modules/**",
-        babelHelpers: "runtime",
-        extensions: [".js", ".ts"],
-      }),
+      // babel({
+      //   exclude: "**/node_modules/**",
+      //   babelHelpers: "runtime",
+      //   extensions: [".js", ".ts"],
+      // }),
     ],
   }),
   {

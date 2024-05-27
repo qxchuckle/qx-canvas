@@ -1,13 +1,31 @@
 {
   "name": "qx-canvas",
+  "author": "qxchuckle",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "小巧、高性能的 Canvas2D 引擎，具有事件系统、碰撞检测",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "browser": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qxchuckle/qx-canvas.git"
+  },
+  "keywords": [
+    "canvas",
+    "2d",
+    "graphic",
+    "engine",
+    "render",
+    "typescript"
+  ],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "rollup --config rollup.config.prod.mjs",
     "dev": "rollup --config rollup.config.dev.mjs -w -m "
   },
-  "author": "",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.24.5",

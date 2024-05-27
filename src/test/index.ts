@@ -1,12 +1,12 @@
-import * as RollupDemo from "../index";
+import * as QxCanvas from "../index";
 
 const color = document.querySelector("#color") as HTMLInputElement;
 
-const app = new RollupDemo.App({
+const app = new QxCanvas.App({
   canvas: document.querySelector("canvas")!,
   backgroundAlpha: 1,
 });
-const a = new RollupDemo.Graphics()
+const a = new QxCanvas.Graphics()
   .beginFill()
   .drawRect(0, 0, 100, 100)
   .beginFill({
@@ -17,7 +17,7 @@ const a = new RollupDemo.Graphics()
 a.transform.rotate = 45 * (Math.PI / 180);
 a.transform.scale.set(2, 2);
 
-const b = new RollupDemo.Graphics().beginFill().drawRect(200, 50, 100, 100);
+const b = new QxCanvas.Graphics().beginFill().drawRect(200, 50, 100, 100);
 b.transform.rotate = 45 * (Math.PI / 180);
 b.transform.pivot.set(200, 50);
 b.addEventListener("click", (e) => {
@@ -54,7 +54,7 @@ a.addEventListener("mousedown", (e) => {
 
 // 绘制10w个矩形
 // for (let i = 0; i < 100000; i++) {
-//   const g = new RollupDemo.Graphics()
+//   const g = new QxCanvas.Graphics()
 //     .beginFill({
 //       color: `rgb(${Math.random() * 255},${Math.random() * 255},${
 //         Math.random() * 255
@@ -73,7 +73,7 @@ a.addEventListener("mousedown", (e) => {
 // }
 
 // 绘制圆形
-const c = new RollupDemo.Graphics()
+const c = new QxCanvas.Graphics()
   .beginFill({
     color: "red",
   })
@@ -82,7 +82,7 @@ const c = new RollupDemo.Graphics()
 app.stage.add(c);
 
 // 绘制椭圆
-const d = new RollupDemo.Graphics()
+const d = new QxCanvas.Graphics()
   .beginFill({
     color: "green",
   })
@@ -91,7 +91,7 @@ const d = new RollupDemo.Graphics()
 app.stage.add(d);
 
 // 绘制圆角矩形
-const rt = new RollupDemo.Graphics()
+const rt = new QxCanvas.Graphics()
   .beginFill({
     color: "black",
   })
@@ -123,7 +123,7 @@ rt.addEventListener("mousedown", (e) => {
 });
 
 // 绘制多边形
-const p = new RollupDemo.Graphics()
+const p = new QxCanvas.Graphics()
   .beginFill({
     color: "purple",
   })
@@ -154,7 +154,7 @@ p.addEventListener("mousedown", (e) => {
 app.stage.add(p);
 
 // 自由绘制线段
-const s = new RollupDemo.Graphics()
+const s = new QxCanvas.Graphics()
   .beginLine({ width: 2, color: "green" })
   .beginFill({ color: "pink" })
   .moveTo(100, 100)
@@ -173,7 +173,7 @@ const s = new RollupDemo.Graphics()
 app.stage.add(s);
 
 // 自由绘制线段
-const s1 = new RollupDemo.Graphics();
+const s1 = new QxCanvas.Graphics();
 app.stage.add(s1);
 app.stage.addEventListener("mousedown", (e) => {
   // s1.beginPath();

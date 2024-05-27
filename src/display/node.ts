@@ -1,7 +1,6 @@
 import { Cursor, EventType, EventListener, EventOptions } from "../types";
 import { Point, Transform } from "../math";
 import { Shape } from "../shapes";
-import Eventemitter from "eventemitter3";
 import { EventClient } from "../events/eventClient";
 
 // 节点基类，所有节点都继承自该类，节点直接继承自 EventClient，实现事件机制

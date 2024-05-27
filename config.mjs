@@ -1,1 +1,1 @@
-export const name = "RollupDemo";
+export const name = "QxCanvas";
