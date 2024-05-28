@@ -72,12 +72,12 @@ declare class Matrix {
 }
 
 declare class Transform {
-    private localMatrix;
-    worldMatrix: Matrix;
-    position: ObservablePoint;
-    pivot: ObservablePoint;
-    scale: ObservablePoint;
-    skew: ObservablePoint;
+    private readonly localMatrix;
+    readonly worldMatrix: Matrix;
+    readonly position: ObservablePoint;
+    readonly pivot: ObservablePoint;
+    readonly scale: ObservablePoint;
+    readonly skew: ObservablePoint;
     private _rotate;
     private rotateMatrix;
     private skewMatrix;
@@ -116,15 +116,24 @@ declare class CanvasRenderer extends Renderer<CanvasRenderingContext2D> {
     private renderBackground;
 }
 
-type FillStyleType = {
+declare const defaultStyle$1: {
     color: string | CanvasGradient | CanvasPattern;
     alpha: number;
     visible: boolean;
+    shadowOffsetX: number;
+    shadowOffsetY: number;
+    shadowBlur: number;
+    shadowColor: string;
 };
+type FillStyleType = typeof defaultStyle$1;
 declare class FillStyle {
-    color: FillStyleType["color"];
-    alpha: FillStyleType["alpha"];
-    visible: FillStyleType["visible"];
+    color: string | CanvasGradient | CanvasPattern;
+    alpha: number;
+    visible: boolean;
+    shadowOffsetX: number;
+    shadowOffsetY: number;
+    shadowBlur: number;
+    shadowColor: string;
     constructor(style?: Partial<FillStyleType>);
     set(style?: Partial<FillStyleType>): void;
     clone(): FillStyle;
@@ -137,6 +146,7 @@ declare const defaultStyle: {
     cap: LINE_CAP;
     join: LINE_JOIN;
     miterLimit: number;
+    lineDash: number[];
 };
 type LineStyleType = typeof defaultStyle & FillStyleType;
 declare class LineStyle extends FillStyle {
@@ -144,6 +154,7 @@ declare class LineStyle extends FillStyle {
     cap: LINE_CAP;
     join: LINE_JOIN;
     miterLimit: number;
+    lineDash: number[];
     constructor(style?: Partial<LineStyleType>);
     set(style?: Partial<LineStyleType>): void;
     clone(): LineStyle;
@@ -164,6 +175,7 @@ declare class Graphics extends Group {
     private readonly lineStyle;
     private currentPath;
     constructor();
+    private setCtxStyle;
     protected renderSelf(renderer: CanvasRenderer): this;
     beginFill(style?: Partial<FillStyleType>): this;
     beginLine(style?: Partial<LineStyleType & FillStyleType>): this;
@@ -182,10 +194,66 @@ declare class Graphics extends Group {
     endLine(): this;
 }
 
+type SetCtxStyle = (ctx: CanvasRenderingContext2D, data: GraphicsData, isFill: boolean) => void;
 declare abstract class Shape {
     abstract readonly type: ShapeType;
-    abstract render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number): void;
+    abstract render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number, setCtxStyle: SetCtxStyle): void;
     abstract contains(p: Point): boolean;
+}
+
+declare class Rectangle extends Shape {
+    readonly type = ShapeType.Rectangle;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    constructor(x: number, y: number, width: number, height: number);
+    contains(p: Point): boolean;
+    render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number, setCtxStyle: SetCtxStyle): void;
+}
+
+declare class Circle extends Shape {
+    readonly type = ShapeType.Circle;
+    x: number;
+    y: number;
+    radius: number;
+    constructor(x: number, y: number, radius: number);
+    contains(p: Point): boolean;
+    render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number, setCtxStyle: SetCtxStyle): void;
+}
+
+declare class Ellipse extends Shape {
+    readonly type = ShapeType.Ellipse;
+    x: number;
+    y: number;
+    radiusX: number;
+    radiusY: number;
+    constructor(x: number, y: number, radiusX: number, radiusY: number);
+    contains(p: Point): boolean;
+    render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number, setCtxStyle: SetCtxStyle): void;
+}
+
+declare class RoundRect extends Shape {
+    readonly type = ShapeType.RoundRect;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    radius: number;
+    constructor(x: number, y: number, width: number, height: number, radius: number);
+    contains(p: Point): boolean;
+    render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number, setCtxStyle: SetCtxStyle): void;
+}
+
+declare class Polygon extends Shape {
+    readonly type = ShapeType.Polygon;
+    private points;
+    private closePath;
+    constructor(points: number[], closePath?: boolean);
+    contains(p: Point): boolean;
+    render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number, setCtxStyle: SetCtxStyle): void;
+    reset(): void;
+    clone(): Polygon;
 }
 
 type EventListener$1 = (...args: any[]) => void;
@@ -204,12 +272,14 @@ declare abstract class Node extends EventClient {
     protected alpha: number;
     protected worldAlpha: number;
     private _zIndex;
-    transform: Transform;
+    readonly transform: Transform;
     cursor: Cursor;
     hitArea: Shape | null;
     protected sorted: boolean;
-    abstract parent: Node | null;
-    abstract readonly children: Node[];
+    parent: this | null;
+    readonly children: this[];
+    id: string;
+    class: string[];
     get zIndex(): number;
     set zIndex(value: number);
     setZIndex(index: number): this;
@@ -217,6 +287,10 @@ declare abstract class Node extends EventClient {
     setVisible(visible: boolean): this;
     setCursor(cursor: Cursor): this;
     setHitArea(hitArea: Shape): this;
+    setId(id: string): this;
+    setClass(className: string): this;
+    addClass(className: string): this;
+    removeClass(className: string): this;
     setScale(x: number, y: number): this;
     setRotation(rotation: number): this;
     setPosition(x: number, y: number): this;
@@ -225,19 +299,20 @@ declare abstract class Node extends EventClient {
     protected sort(): void;
     contains(p: Point): boolean;
     updateTransform(): void;
-    addEventListener(type: EventType, listener: EventListener, options?: boolean | EventOptions): void;
-    removeEventListener(type: EventType, listener: EventListener, capture?: boolean): void;
+    addEventListener(type: EventType, listener: EventListener, options?: boolean | EventOptions): this;
+    removeEventListener(type: EventType, listener: EventListener, capture?: boolean): this;
     private analyzeEventOptions;
+    findById(id: string): this | null;
+    findByClass(className: string): this[];
 }
 
 declare class Group extends Node {
-    parent: Group | null;
-    readonly children: Group[];
     renderCanvas(renderer: CanvasRenderer): this | undefined;
     protected renderSelf(renderer: CanvasRenderer): this;
     protected renderChildren(renderer: CanvasRenderer): this;
-    add(child: Group): this;
-    remove(child: Group): this;
+    private addOneChild;
+    add(child: this | this[]): this;
+    remove(child: this): this;
     removeChildren(): this;
     removeSelf(): this;
     destroy(): void;
@@ -289,4 +364,12 @@ declare class App<T extends IContext["ctx"] = CanvasRenderingContext2D> {
     get canvas(): HTMLCanvasElement;
 }
 
-export { App, Graphics };
+declare const shapes: {
+    Circle: typeof Circle;
+    Ellipse: typeof Ellipse;
+    Polygon: typeof Polygon;
+    Rectangle: typeof Rectangle;
+    RoundRect: typeof RoundRect;
+};
+
+export { App, Graphics, shapes };

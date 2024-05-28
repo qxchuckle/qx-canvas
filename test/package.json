@@ -1,0 +1,29 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "scripts": {
+    "build": "rollup --config rollup.config.prod.mjs",
+    "dev": "rollup --config rollup.config.dev.mjs -w -m "
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^25.0.8",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "rollup": "^4.18.0",
+    "rollup-plugin-clear": "^2.0.7",
+    "rollup-plugin-dts": "^6.1.1",
+    "rollup-plugin-livereload": "^2.0.5",
+    "rollup-plugin-serve": "^2.0.3",
+    "tslib": "^2.6.2"
+  },
+  "dependencies": {
+    "qx-canvas": "^1.0.0"
+  }
+}

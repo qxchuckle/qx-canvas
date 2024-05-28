@@ -76,6 +76,12 @@
         const x = ((oy - py1) * (px2 - px1)) / (py2 - py1) + px1;
         return x > ox;
     }
+    function isSameArray(arr1, arr2) {
+        if (arr1.length !== arr2.length) {
+            return false;
+        }
+        return arr1.every((item, index) => item === arr2[index]);
+    }
 
     class Point {
         x;
@@ -192,6 +198,8 @@
         }
     }
 
+    const DEG_TO_RAD = Math.PI / 180;
+
     class Transform {
         localMatrix = new Matrix();
         worldMatrix = new Matrix();
@@ -218,7 +226,7 @@
             return this._rotate;
         }
         set rotate(r) {
-            this._rotate = r;
+            this._rotate = r * DEG_TO_RAD;
             this.rotateMatrix.set(Math.cos(this.rotate), Math.sin(this.rotate), -Math.sin(this.rotate), Math.cos(this.rotate), 0, 0);
             this.shouldUpdateLocalMatrix = true;
         }
@@ -311,6 +319,10 @@
         cursor = "auto";
         hitArea = null;
         sorted = false;
+        parent = null;
+        children = [];
+        id = "";
+        class = [];
         get zIndex() {
             return this._zIndex;
         }
@@ -338,6 +350,23 @@
         }
         setHitArea(hitArea) {
             this.hitArea = hitArea;
+            return this;
+        }
+        setId(id) {
+            this.id = id;
+            return this;
+        }
+        setClass(className) {
+            this.class = className.split(" ");
+            return this;
+        }
+        addClass(className) {
+            this.class.push(...className.split(" "));
+            return this;
+        }
+        removeClass(className) {
+            const classes = className.split(" ");
+            this.class = this.class.filter((c) => !classes.includes(c));
             return this;
         }
         setScale(x, y) {
@@ -392,10 +421,12 @@
             else {
                 this.on(realType, listener);
             }
+            return this;
         }
         removeEventListener(type, listener, capture) {
             const realType = capture ? `${type}_capture` : `${type}_bubble`;
             this.off(realType, listener);
+            return this;
         }
         analyzeEventOptions(options) {
             if (typeof options === "boolean") {
@@ -409,11 +440,31 @@
                 once: options?.once ?? false,
             };
         }
+        findById(id) {
+            if (this.id === id) {
+                return this;
+            }
+            for (let i = 0; i < this.children.length; i++) {
+                const node = this.children[i].findById(id);
+                if (node) {
+                    return node;
+                }
+            }
+            return null;
+        }
+        findByClass(className) {
+            const result = [];
+            if (this.class.includes(className)) {
+                result.push(this);
+            }
+            for (let i = 0; i < this.children.length; i++) {
+                result.push(...this.children[i].findByClass(className));
+            }
+            return result;
+        }
     }
 
     class Group extends Node {
-        parent = null;
-        children = [];
         renderCanvas(renderer) {
             if (!this.visible) {
                 return;
@@ -434,11 +485,21 @@
             }
             return this;
         }
-        add(child) {
+        addOneChild(child) {
             child.parent?.remove(child);
             this.children.push(child);
             child.parent = this;
             this.sorted = false;
+        }
+        add(child) {
+            if (Array.isArray(child)) {
+                for (let i = 0; i < child.length; i++) {
+                    this.addOneChild(child[i]);
+                }
+            }
+            else {
+                this.addOneChild(child);
+            }
             return this;
         }
         remove(child) {
@@ -794,14 +855,16 @@
                 return false;
             }
         }
-        render(renderer, data, worldAlpha) {
+        render(renderer, data, worldAlpha, setCtxStyle) {
             const ctx = renderer.ctx;
             const fillStyle = data.fillStyle;
             const lineStyle = data.lineStyle;
             if (fillStyle.visible) {
+                setCtxStyle(ctx, data, true);
                 ctx.fillRect(this.x, this.y, this.width, this.height);
             }
             if (lineStyle.visible) {
+                setCtxStyle(ctx, data, false);
                 ctx.strokeRect(this.x, this.y, this.width, this.height);
             }
         }
@@ -822,15 +885,17 @@
             return (Math.pow(p.x - this.x, 2) + Math.pow(p.y - this.y, 2) <=
                 Math.pow(this.radius, 2));
         }
-        render(renderer, data, worldAlpha) {
+        render(renderer, data, worldAlpha, setCtxStyle) {
             const ctx = renderer.ctx;
             const fillStyle = data.fillStyle;
             const lineStyle = data.lineStyle;
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
             if (fillStyle.visible) {
+                setCtxStyle(ctx, data, true);
                 ctx.fill();
             }
             if (lineStyle.visible) {
+                setCtxStyle(ctx, data, false);
                 ctx.stroke();
             }
         }
@@ -854,15 +919,17 @@
                 Math.pow(p.y - this.y, 2) / Math.pow(this.radiusY, 2) <=
                 1);
         }
-        render(renderer, data, worldAlpha) {
+        render(renderer, data, worldAlpha, setCtxStyle) {
             const ctx = renderer.ctx;
             const fillStyle = data.fillStyle;
             const lineStyle = data.lineStyle;
             ctx.ellipse(this.x, this.y, this.radiusX, this.radiusY, 0, 0, Math.PI * 2);
             if (fillStyle.visible) {
+                setCtxStyle(ctx, data, true);
                 ctx.fill();
             }
             if (lineStyle.visible) {
+                setCtxStyle(ctx, data, false);
                 ctx.stroke();
             }
         }
@@ -917,15 +984,17 @@
             }
             return true;
         }
-        render(renderer, data, worldAlpha) {
+        render(renderer, data, worldAlpha, setCtxStyle) {
             const ctx = renderer.ctx;
             ctx.roundRect(this.x, this.y, this.width, this.height, this.radius);
             const fillStyle = data.fillStyle;
             const lineStyle = data.lineStyle;
             if (fillStyle.visible) {
+                setCtxStyle(ctx, data, true);
                 ctx.fill();
             }
             if (lineStyle.visible) {
+                setCtxStyle(ctx, data, false);
                 ctx.stroke();
             }
         }
@@ -958,7 +1027,7 @@
                 return true;
             }
         }
-        render(renderer, data, worldAlpha) {
+        render(renderer, data, worldAlpha, setCtxStyle) {
             const ctx = renderer.ctx;
             const fillStyle = data.fillStyle;
             const lineStyle = data.lineStyle;
@@ -977,9 +1046,11 @@
                 ctx.closePath();
             }
             if (fillStyle.visible) {
+                setCtxStyle(ctx, data, true);
                 ctx.fill();
             }
             if (lineStyle.visible) {
+                setCtxStyle(ctx, data, false);
                 ctx.stroke();
             }
         }
@@ -996,37 +1067,47 @@
         color: "#000",
         alpha: 1,
         visible: false,
+        shadowOffsetX: 0,
+        shadowOffsetY: 0,
+        shadowBlur: 0,
+        shadowColor: "#000",
     };
     class FillStyle {
-        color;
-        alpha;
-        visible;
+        color = defaultStyle$1.color;
+        alpha = defaultStyle$1.alpha;
+        visible = defaultStyle$1.visible;
+        shadowOffsetX = defaultStyle$1.shadowOffsetX;
+        shadowOffsetY = defaultStyle$1.shadowOffsetY;
+        shadowBlur = defaultStyle$1.shadowBlur;
+        shadowColor = defaultStyle$1.shadowColor;
         constructor(style = {}) {
-            this.color = style.color ?? defaultStyle$1.color;
-            this.alpha = style.alpha ?? defaultStyle$1.alpha;
-            this.visible = style.visible ?? defaultStyle$1.visible;
+            this.set(style);
         }
         set(style = {}) {
             this.color = style.color ?? defaultStyle$1.color;
             this.alpha = style.alpha ?? defaultStyle$1.alpha;
             this.visible = style.visible ?? defaultStyle$1.visible;
+            this.shadowOffsetX = style.shadowOffsetX ?? defaultStyle$1.shadowOffsetX;
+            this.shadowOffsetY = style.shadowOffsetY ?? defaultStyle$1.shadowOffsetY;
+            this.shadowBlur = style.shadowBlur ?? defaultStyle$1.shadowBlur;
+            this.shadowColor = style.shadowColor ?? defaultStyle$1.shadowColor;
         }
         clone() {
             const obj = new FillStyle();
-            obj.color = this.color;
-            obj.alpha = this.alpha;
-            obj.visible = this.visible;
+            obj.set(this);
             return obj;
         }
         reset() {
-            this.color = defaultStyle$1.color;
-            this.alpha = defaultStyle$1.alpha;
-            this.visible = defaultStyle$1.visible;
+            this.set(defaultStyle$1);
         }
         isSameOf(style) {
             return (this.color === style.color &&
                 this.alpha === style.alpha &&
-                this.visible === style.visible);
+                this.visible === style.visible &&
+                this.shadowOffsetX === style.shadowOffsetX &&
+                this.shadowOffsetY === style.shadowOffsetY &&
+                this.shadowBlur === style.shadowBlur &&
+                this.shadowColor === style.shadowColor);
         }
     }
 
@@ -1035,18 +1116,17 @@
         cap: LINE_CAP.BUTT,
         join: LINE_JOIN.MITER,
         miterLimit: 10,
+        lineDash: [],
     };
     class LineStyle extends FillStyle {
-        width;
-        cap;
-        join;
-        miterLimit;
+        width = defaultStyle.width;
+        cap = LINE_CAP.BUTT;
+        join = LINE_JOIN.MITER;
+        miterLimit = 10;
+        lineDash = [];
         constructor(style = {}) {
             super(style);
-            this.width = style.width ?? defaultStyle.width;
-            this.cap = style.cap ?? defaultStyle.cap;
-            this.join = style.join ?? defaultStyle.join;
-            this.miterLimit = style.miterLimit ?? defaultStyle.miterLimit;
+            this.set(style);
         }
         set(style = {}) {
             super.set(style);
@@ -1054,35 +1134,32 @@
             this.cap = style.cap ?? defaultStyle.cap;
             this.join = style.join ?? defaultStyle.join;
             this.miterLimit = style.miterLimit ?? defaultStyle.miterLimit;
+            this.lineDash = style.lineDash ?? defaultStyle.lineDash;
         }
         clone() {
             const obj = new LineStyle();
-            obj.color = this.color;
-            obj.alpha = this.alpha;
-            obj.visible = this.visible;
-            obj.width = this.width;
-            obj.cap = this.cap;
-            obj.join = this.join;
-            obj.miterLimit = this.miterLimit;
+            obj.set(this);
             return obj;
         }
         reset() {
             super.reset();
-            this.width = defaultStyle.width;
-            this.cap = LINE_CAP.BUTT;
-            this.join = LINE_JOIN.MITER;
-            this.miterLimit = 10;
+            this.set(defaultStyle);
         }
         isSameOf(style) {
             return (super.isSameOf({
                 color: style.color,
                 alpha: style.alpha,
                 visible: style.visible,
+                shadowOffsetX: style.shadowOffsetX,
+                shadowOffsetY: style.shadowOffsetY,
+                shadowBlur: style.shadowBlur,
+                shadowColor: style.shadowColor,
             }) &&
                 this.width === style.width &&
                 this.cap === style.cap &&
                 this.join === style.join &&
-                this.miterLimit === style.miterLimit);
+                this.miterLimit === style.miterLimit &&
+                isSameArray(this.lineDash, style.lineDash));
         }
     }
 
@@ -1149,28 +1226,27 @@
                 return;
             }
             if (style.lineStyle) {
-                this.stroke(ctx);
+                this.stroke(ctx, worldAlpha);
                 this.lineStyle.set(style.lineStyle);
-                if (this.lineStyle.visible) {
-                    ctx.lineWidth = this.lineStyle.width;
-                    ctx.lineCap = this.lineStyle.cap;
-                    ctx.lineJoin = this.lineStyle.join;
-                    ctx.strokeStyle = this.lineStyle.color;
-                    ctx.globalAlpha = this.lineStyle.alpha * worldAlpha;
-                }
             }
             if (style.fillStyle) {
-                this.fill(ctx);
+                this.fill(ctx, worldAlpha);
                 this.fillStyle.set(style.fillStyle);
-                if (this.fillStyle.visible) {
-                    ctx.fillStyle = this.fillStyle.color;
-                    ctx.globalAlpha = this.fillStyle.alpha * worldAlpha;
-                }
             }
             this.closePath = style.closePath ?? false;
         }
-        stroke(ctx) {
+        stroke(ctx, worldAlpha) {
             if (this.lineStyle.visible && this.points.length > 0) {
+                ctx.lineWidth = this.lineStyle.width;
+                ctx.lineCap = this.lineStyle.cap;
+                ctx.lineJoin = this.lineStyle.join;
+                ctx.strokeStyle = this.lineStyle.color;
+                ctx.globalAlpha = this.lineStyle.alpha * worldAlpha;
+                ctx.shadowOffsetX = this.lineStyle.shadowOffsetX;
+                ctx.shadowOffsetY = this.lineStyle.shadowOffsetY;
+                ctx.shadowBlur = this.lineStyle.shadowBlur;
+                ctx.shadowColor = this.lineStyle.shadowColor;
+                ctx.setLineDash(this.lineStyle.lineDash);
                 if (this.closePath) {
                     this.path2D.linePath.closePath();
                 }
@@ -1178,8 +1254,14 @@
             }
             this.path2D.linePath = new Path2D();
         }
-        fill(ctx) {
+        fill(ctx, worldAlpha) {
             if (this.fillStyle.visible && this.points.length > 0) {
+                ctx.fillStyle = this.fillStyle.color;
+                ctx.globalAlpha = this.fillStyle.alpha * worldAlpha;
+                ctx.shadowOffsetX = this.fillStyle.shadowOffsetX;
+                ctx.shadowOffsetY = this.fillStyle.shadowOffsetY;
+                ctx.shadowBlur = this.fillStyle.shadowBlur;
+                ctx.shadowColor = this.fillStyle.shadowColor;
                 ctx.fill(this.path2D.fillPath);
             }
             this.path2D.fillPath = new Path2D();
@@ -1214,8 +1296,8 @@
                 this.updateStyle(ctx, i + 1, worldAlpha);
             }
             if (this.lastStateIndex >= 0) {
-                this.stroke(ctx);
-                this.fill(ctx);
+                this.stroke(ctx, worldAlpha);
+                this.fill(ctx, worldAlpha);
             }
             this.lineStyle.reset();
             this.fillStyle.reset();
@@ -1282,6 +1364,28 @@
             super();
             this.drawShape(this.currentPath);
         }
+        setCtxStyle = (ctx, data, isFill) => {
+            if (data.fillStyle.visible && isFill) {
+                ctx.fillStyle = data.fillStyle.color;
+                ctx.globalAlpha = data.fillStyle.alpha * this.worldAlpha;
+                ctx.shadowOffsetX = data.fillStyle.shadowOffsetX;
+                ctx.shadowOffsetY = data.fillStyle.shadowOffsetY;
+                ctx.shadowBlur = data.fillStyle.shadowBlur;
+                ctx.shadowColor = data.fillStyle.shadowColor;
+            }
+            if (data.lineStyle.visible && !isFill) {
+                ctx.lineWidth = data.lineStyle.width;
+                ctx.lineCap = data.lineStyle.cap;
+                ctx.lineJoin = data.lineStyle.join;
+                ctx.strokeStyle = data.lineStyle.color;
+                ctx.globalAlpha = data.lineStyle.alpha * this.worldAlpha;
+                ctx.shadowOffsetX = data.lineStyle.shadowOffsetX;
+                ctx.shadowOffsetY = data.lineStyle.shadowOffsetY;
+                ctx.shadowBlur = data.lineStyle.shadowBlur;
+                ctx.shadowColor = data.lineStyle.shadowColor;
+                ctx.setLineDash(data.lineStyle.lineDash);
+            }
+        };
         renderSelf(renderer) {
             const ctx = renderer.ctx;
             ctx.save();
@@ -1290,18 +1394,7 @@
                 const data = this.graphicsDataList[i];
                 ctx.save();
                 ctx.beginPath();
-                if (data.fillStyle.visible) {
-                    ctx.fillStyle = data.fillStyle.color;
-                    ctx.globalAlpha = data.fillStyle.alpha * this.worldAlpha;
-                }
-                if (data.lineStyle.visible) {
-                    ctx.lineWidth = data.lineStyle.width;
-                    ctx.lineCap = data.lineStyle.cap;
-                    ctx.lineJoin = data.lineStyle.join;
-                    ctx.strokeStyle = data.lineStyle.color;
-                    ctx.globalAlpha = data.lineStyle.alpha * this.worldAlpha;
-                }
-                data.shape.render(renderer, data, this.worldAlpha);
+                data.shape.render(renderer, data, this.worldAlpha, this.setCtxStyle);
                 ctx.restore();
             }
             ctx.restore();
@@ -1395,7 +1488,16 @@
         }
     }
 
+    const shapes = {
+        Circle,
+        Ellipse,
+        Polygon,
+        Rectangle,
+        RoundRect,
+    };
+
     exports.App = App;
     exports.Graphics = Graphics;
+    exports.shapes = shapes;
 
 }));
