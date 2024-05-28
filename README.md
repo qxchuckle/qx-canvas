@@ -131,7 +131,7 @@ declare abstract class Node extends EventClient {
   get zIndex(): number; // 获取节点层级
   set zIndex(value: number); // 设置节点层级
 
-  // 一些set方法，返回this，方便链式调用
+  // 一些操作属性的方法，返回this，方便链式调用
   setZIndex(index: number): this; // 设置节点层级
   setAlpha(alpha: number): this; // 设置透明度
   setVisible(visible: boolean): this; // 设置可见性
@@ -189,7 +189,7 @@ declare class Graphics extends Group {
   readonly graphicsDataList: GraphicsData[];
   // 开始填充或描边
   beginFill(style?: Partial<FillStyleType>): this;
-  beginLine(style?: Partial<LineStyleType & FillStyleType>): this;
+  beginLine(style?: Partial<LineStyleType>): this;
   // 结束填充或描边
   endFill(): this;
   endLine(): this;
