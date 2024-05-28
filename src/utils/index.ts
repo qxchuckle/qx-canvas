@@ -46,3 +46,11 @@ export function isSameArray(arr1: any[], arr2: any[]) {
   }
   return arr1.every((item, index) => item === arr2[index]);
 }
+// 异步
+export function nextTick(fn: (...argv: any[]) => void) {
+  if (typeof Promise !== "undefined") {
+    Promise.resolve().then(fn);
+  } else {
+    setTimeout(fn, 0);
+  }
+}

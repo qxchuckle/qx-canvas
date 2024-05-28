@@ -192,17 +192,28 @@ const s = new QxCanvas.Graphics()
 app.stage.add(s);
 
 // 生命周期测试
-// s.onBeforeRender((item, renderer) => {
-//   console.log("before render");
-//   item.setPosition(
-//     item.transform.position.x + 1,
-//     item.transform.position.y + 1
-//   );
-// });
-
-// s.onAfterRender((item, renderer) => {
-//   console.log("after render");
-// });
+s.onBeforeMount((item) => {
+  console.log("before mount");
+})
+  .onMounted((item) => {
+    console.log("mounted");
+  })
+  .onBeforeRender((item, renderer) => {
+    console.log("before render");
+  })
+  .onRendering((item, renderer) => {
+    console.log("rendering");
+  })
+  .onRendered((item, renderer) => {
+    console.log("after render");
+    app.stage.remove(s);
+  })
+  .onBeforeUnmount((item) => {
+    console.log("before unmount");
+  })
+  .onUnmounted((item) => {
+    console.log("unmounted");
+  });
 
 // 自由绘制线段
 const s1 = new QxCanvas.Graphics();

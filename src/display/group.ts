@@ -1,6 +1,7 @@
 import { LifecycleHooks, LifecycleKey } from "../types";
 import { CanvasRenderer } from "../renderer";
 import { Node } from "./node";
+import { nextTick } from "../utils";
 
 export class Group extends Node {
   lifecycleHooks: LifecycleHooks = new Map();
@@ -8,7 +9,7 @@ export class Group extends Node {
   // 添加生命周期钩子
   private addLifecycleHook(
     key: LifecycleKey,
-    handler: (item: this, renderer: CanvasRenderer) => void
+    handler: (...argv: any[]) => void
   ) {
     if (!this.lifecycleHooks.has(key)) {
       this.lifecycleHooks.set(key, new Set());
@@ -16,21 +17,53 @@ export class Group extends Node {
     this.lifecycleHooks.get(key)?.add(handler);
   }
 
+  // 添加挂载前钩子
+  onBeforeMount(handler: (item: this) => void) {
+    this.addLifecycleHook(LifecycleKey.BeforeMount, handler);
+    return this;
+  }
+
+  // 添加挂载后钩子
+  onMounted(handler: (item: this) => void) {
+    this.addLifecycleHook(LifecycleKey.Mounted, handler);
+    return this;
+  }
+
   // 添加渲染前钩子
   onBeforeRender(handler: (item: this, renderer: CanvasRenderer) => void) {
     this.addLifecycleHook(LifecycleKey.BeforeRender, handler);
+    return this;
+  }
+
+  // 添加渲染中钩子，自身已经渲染完，但子节点还未渲染
+  onRendering(handler: (item: this, renderer: CanvasRenderer) => void) {
+    this.addLifecycleHook(LifecycleKey.Rendering, handler);
+    return this;
   }
 
   // 添加渲染后钩子
-  onAfterRender(handler: (item: this, renderer: CanvasRenderer) => void) {
-    this.addLifecycleHook(LifecycleKey.AfterRender, handler);
+  onRendered(handler: (item: this, renderer: CanvasRenderer) => void) {
+    this.addLifecycleHook(LifecycleKey.Rendered, handler);
+    return this;
+  }
+
+  // 添加卸载前钩子
+  onBeforeUnmount(handler: (item: this) => void) {
+    this.addLifecycleHook(LifecycleKey.BeforeUnmount, handler);
+    return this;
+  }
+
+  // 添加卸载后钩子
+  onUnmounted(handler: (item: this) => void) {
+    this.addLifecycleHook(LifecycleKey.Unmounted, handler);
+    return this;
   }
 
   // 调用生命周期钩子
-  private callLifecycleHook(
+  protected callLifecycleHook(
     key: LifecycleKey,
     item: this,
-    renderer: CanvasRenderer
+    renderer?: CanvasRenderer
   ) {
     const hooks = this.lifecycleHooks.get(key);
     if (hooks && hooks.size > 0) {
@@ -49,9 +82,10 @@ export class Group extends Node {
     }
     // 渲染自身
     this.renderSelf(renderer);
+    this.callLifecycleHook(LifecycleKey.Rendering, this, renderer);
     // 渲染子节点
     this.renderChildren(renderer);
-    this.callLifecycleHook(LifecycleKey.AfterRender, this, renderer);
+    this.callLifecycleHook(LifecycleKey.Rendered, this, renderer);
     return this;
   }
 
@@ -75,39 +109,49 @@ export class Group extends Node {
   private addOneChild(child: this) {
     // 如果子节点已经有父节点，先从父节点移除
     child.parent?.remove(child);
+    child.callLifecycleHook(LifecycleKey.BeforeMount, child);
     // 添加到当前节点
     this.children.push(child);
     // 设置父节点为当前节点
     child.parent = this;
     // 标记未排序
     this.sorted = false;
+    child.callLifecycleHook(LifecycleKey.Mounted, child);
   }
 
   // 添加子节点
   public add(child: this | this[]) {
-    if (Array.isArray(child)) {
-      for (let i = 0; i < child.length; i++) {
-        this.addOneChild(child[i]);
+    nextTick(() => {
+      if (Array.isArray(child)) {
+        for (let i = 0; i < child.length; i++) {
+          this.addOneChild(child[i]);
+        }
+      } else {
+        this.addOneChild(child);
       }
-    } else {
-      this.addOneChild(child);
-    }
+    });
     return this;
   }
 
   // 移除子节点
   public remove(child: this) {
-    const index = this.children.indexOf(child);
-    if (index !== -1) {
-      this.children.splice(index, 1);
-      child.parent = null;
-    }
+    nextTick(() => {
+      const index = this.children.indexOf(child);
+      if (index !== -1) {
+        child.callLifecycleHook(LifecycleKey.BeforeUnmount, child);
+        this.children.splice(index, 1);
+        child.parent = null;
+        child.callLifecycleHook(LifecycleKey.Unmounted, child);
+      }
+    });
     return this;
   }
 
   // 清空子节点
   public removeChildren() {
-    this.children.length = 0;
+    for (let i = 0; i < this.children.length; i++) {
+      this.remove(this.children[i]);
+    }
     return this;
   }
 

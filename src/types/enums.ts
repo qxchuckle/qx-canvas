@@ -32,6 +32,11 @@ export enum EventPhase {
 
 // 生命周期key
 export enum LifecycleKey {
+  BeforeMount = "beforeMount",
+  Mounted = "mounted",
   BeforeRender = "beforeRender",
-  AfterRender = "afterRender",
+  Rendering = "rendering",
+  Rendered = "rendered",
+  BeforeUnmount = "beforeUnmount",
+  Unmounted = "unmounted",
 }
