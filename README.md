@@ -23,13 +23,14 @@ const app = new QxCanvas.App({
 
 **绘制图形：**  
 `Graphics` 具有一系列绘制基础图形的方法，它们以 **draw** 开头，如 `drawRect`、`drawCircle`、`drawLine` 等。  
-但你应该先调用 `beginFill` 或 `beginLine` 方法，以表明开始填充或描边，并传入样式参数。
+但你应该先调用 `beginFill` 或 `beginLine` 方法，以表明开始**填充**或**描边**，并传入样式参数。
 
 **添加事件：**  
 你可以为**图案对象**添加事件监听器，如 `click`、`mousedown`、`mousemove` 等，并具有和 DOM 一样的事件传播机制。
 
 ```ts
 const rect1 = new QxCanvas.Graphics()
+  // `Graphics` 的所有方法都支持链式调用
   .beginFill({
     color: "blue",
   })
