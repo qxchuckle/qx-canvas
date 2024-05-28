@@ -174,7 +174,7 @@ const s = new QxCanvas.Graphics()
     shadowOffsetX: 5,
     shadowOffsetY: 5,
     shadowBlur: 5,
-    alpha: 0.1,
+    alpha: 0.3,
   })
   .moveTo(100, 100)
   .lineTo(200, 200)
@@ -190,6 +190,19 @@ const s = new QxCanvas.Graphics()
   .closePath();
 
 app.stage.add(s);
+
+// 生命周期测试
+// s.onBeforeRender((item, renderer) => {
+//   console.log("before render");
+//   item.setPosition(
+//     item.transform.position.x + 1,
+//     item.transform.position.y + 1
+//   );
+// });
+
+// s.onAfterRender((item, renderer) => {
+//   console.log("after render");
+// });
 
 // 自由绘制线段
 const s1 = new QxCanvas.Graphics();

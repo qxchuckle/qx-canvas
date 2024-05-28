@@ -29,3 +29,9 @@ export enum EventPhase {
   AT_TARGET = "atTarget", // 目标阶段
   BUBBLING = "bubbling", // 冒泡阶段
 }
+
+// 生命周期key
+export enum LifecycleKey {
+  BeforeRender = "beforeRender",
+  AfterRender = "afterRender",
+}

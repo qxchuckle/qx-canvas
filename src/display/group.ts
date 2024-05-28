@@ -1,9 +1,48 @@
+import { LifecycleHooks, LifecycleKey } from "../types";
 import { CanvasRenderer } from "../renderer";
 import { Node } from "./node";
 
 export class Group extends Node {
+  lifecycleHooks: LifecycleHooks = new Map();
+
+  // 添加生命周期钩子
+  private addLifecycleHook(
+    key: LifecycleKey,
+    handler: (item: this, renderer: CanvasRenderer) => void
+  ) {
+    if (!this.lifecycleHooks.has(key)) {
+      this.lifecycleHooks.set(key, new Set());
+    }
+    this.lifecycleHooks.get(key)?.add(handler);
+  }
+
+  // 添加渲染前钩子
+  onBeforeRender(handler: (item: this, renderer: CanvasRenderer) => void) {
+    this.addLifecycleHook(LifecycleKey.BeforeRender, handler);
+  }
+
+  // 添加渲染后钩子
+  onAfterRender(handler: (item: this, renderer: CanvasRenderer) => void) {
+    this.addLifecycleHook(LifecycleKey.AfterRender, handler);
+  }
+
+  // 调用生命周期钩子
+  private callLifecycleHook(
+    key: LifecycleKey,
+    item: this,
+    renderer: CanvasRenderer
+  ) {
+    const hooks = this.lifecycleHooks.get(key);
+    if (hooks && hooks.size > 0) {
+      for (const hook of hooks) {
+        hook.call(this, item, renderer);
+      }
+    }
+  }
+
   // 渲染自身，及其子节点
   public renderCanvas(renderer: CanvasRenderer) {
+    this.callLifecycleHook(LifecycleKey.BeforeRender, this, renderer);
     // 如果不可见，直接返回
     if (!this.visible) {
       return;
@@ -12,6 +51,7 @@ export class Group extends Node {
     this.renderSelf(renderer);
     // 渲染子节点
     this.renderChildren(renderer);
+    this.callLifecycleHook(LifecycleKey.AfterRender, this, renderer);
     return this;
   }
 
