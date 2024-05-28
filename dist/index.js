@@ -51,6 +51,45 @@
         }
     }
 
+    var ShapeType;
+    (function (ShapeType) {
+        ShapeType["Rectangle"] = "rectangle";
+        ShapeType["Polygon"] = "polygon";
+        ShapeType["Circle"] = "circle";
+        ShapeType["Ellipse"] = "ellipse";
+        ShapeType["RoundRect"] = "roundRect";
+        ShapeType["Path"] = "path";
+    })(ShapeType || (ShapeType = {}));
+    var LINE_CAP;
+    (function (LINE_CAP) {
+        LINE_CAP["BUTT"] = "butt";
+        LINE_CAP["ROUND"] = "round";
+        LINE_CAP["SQUARE"] = "square";
+    })(LINE_CAP || (LINE_CAP = {}));
+    var LINE_JOIN;
+    (function (LINE_JOIN) {
+        LINE_JOIN["MITER"] = "miter";
+        LINE_JOIN["BEVEL"] = "bevel";
+        LINE_JOIN["ROUND"] = "round";
+    })(LINE_JOIN || (LINE_JOIN = {}));
+    var EventPhase;
+    (function (EventPhase) {
+        EventPhase["NONE"] = "none";
+        EventPhase["CAPTURING"] = "capturing";
+        EventPhase["AT_TARGET"] = "atTarget";
+        EventPhase["BUBBLING"] = "bubbling";
+    })(EventPhase || (EventPhase = {}));
+    var LifecycleKey;
+    (function (LifecycleKey) {
+        LifecycleKey["BeforeMount"] = "beforeMount";
+        LifecycleKey["Mounted"] = "mounted";
+        LifecycleKey["BeforeRender"] = "beforeRender";
+        LifecycleKey["Rendering"] = "rendering";
+        LifecycleKey["Rendered"] = "rendered";
+        LifecycleKey["BeforeUnmount"] = "beforeUnmount";
+        LifecycleKey["Unmounted"] = "unmounted";
+    })(LifecycleKey || (LifecycleKey = {}));
+
     const getArrLast = (arr) => {
         return arr.length > 0 ? arr[arr.length - 1] : null;
     };
@@ -81,6 +120,14 @@
             return false;
         }
         return arr1.every((item, index) => item === arr2[index]);
+    }
+    function nextTick(fn) {
+        if (typeof Promise !== "undefined") {
+            Promise.resolve().then(fn);
+        }
+        else {
+            setTimeout(fn, 0);
+        }
     }
 
     class Point {
@@ -238,6 +285,8 @@
             this.shouldUpdateLocalMatrix = true;
         };
         onSkewChange = (skewX, skewY) => {
+            skewX *= DEG_TO_RAD;
+            skewY *= DEG_TO_RAD;
             this.skewMatrix.set(Math.cos(skewY), Math.sin(skewY), Math.sin(skewX), Math.cos(skewX), 0, 0);
             this.shouldUpdateLocalMatrix = true;
         };
@@ -465,12 +514,58 @@
     }
 
     class Group extends Node {
+        lifecycleHooks = new Map();
+        addLifecycleHook(key, handler) {
+            if (!this.lifecycleHooks.has(key)) {
+                this.lifecycleHooks.set(key, new Set());
+            }
+            this.lifecycleHooks.get(key)?.add(handler);
+        }
+        onBeforeMount(handler) {
+            this.addLifecycleHook(LifecycleKey.BeforeMount, handler);
+            return this;
+        }
+        onMounted(handler) {
+            this.addLifecycleHook(LifecycleKey.Mounted, handler);
+            return this;
+        }
+        onBeforeRender(handler) {
+            this.addLifecycleHook(LifecycleKey.BeforeRender, handler);
+            return this;
+        }
+        onRendering(handler) {
+            this.addLifecycleHook(LifecycleKey.Rendering, handler);
+            return this;
+        }
+        onRendered(handler) {
+            this.addLifecycleHook(LifecycleKey.Rendered, handler);
+            return this;
+        }
+        onBeforeUnmount(handler) {
+            this.addLifecycleHook(LifecycleKey.BeforeUnmount, handler);
+            return this;
+        }
+        onUnmounted(handler) {
+            this.addLifecycleHook(LifecycleKey.Unmounted, handler);
+            return this;
+        }
+        callLifecycleHook(key, item, renderer) {
+            const hooks = this.lifecycleHooks.get(key);
+            if (hooks && hooks.size > 0) {
+                for (const hook of hooks) {
+                    hook.call(this, item, renderer);
+                }
+            }
+        }
         renderCanvas(renderer) {
+            this.callLifecycleHook(LifecycleKey.BeforeRender, this, renderer);
             if (!this.visible) {
                 return;
             }
             this.renderSelf(renderer);
+            this.callLifecycleHook(LifecycleKey.Rendering, this, renderer);
             this.renderChildren(renderer);
+            this.callLifecycleHook(LifecycleKey.Rendered, this, renderer);
             return this;
         }
         renderSelf(renderer) {
@@ -487,31 +582,41 @@
         }
         addOneChild(child) {
             child.parent?.remove(child);
+            child.callLifecycleHook(LifecycleKey.BeforeMount, child);
             this.children.push(child);
             child.parent = this;
             this.sorted = false;
+            child.callLifecycleHook(LifecycleKey.Mounted, child);
         }
         add(child) {
-            if (Array.isArray(child)) {
-                for (let i = 0; i < child.length; i++) {
-                    this.addOneChild(child[i]);
+            nextTick(() => {
+                if (Array.isArray(child)) {
+                    for (let i = 0; i < child.length; i++) {
+                        this.addOneChild(child[i]);
+                    }
                 }
-            }
-            else {
-                this.addOneChild(child);
-            }
+                else {
+                    this.addOneChild(child);
+                }
+            });
             return this;
         }
         remove(child) {
-            const index = this.children.indexOf(child);
-            if (index !== -1) {
-                this.children.splice(index, 1);
-                child.parent = null;
-            }
+            nextTick(() => {
+                const index = this.children.indexOf(child);
+                if (index !== -1) {
+                    child.callLifecycleHook(LifecycleKey.BeforeUnmount, child);
+                    this.children.splice(index, 1);
+                    child.parent = null;
+                    child.callLifecycleHook(LifecycleKey.Unmounted, child);
+                }
+            });
             return this;
         }
         removeChildren() {
-            this.children.length = 0;
+            for (let i = 0; i < this.children.length; i++) {
+                this.remove(this.children[i]);
+            }
             return this;
         }
         removeSelf() {
@@ -536,35 +641,6 @@
             return res.reverse();
         }
     }
-
-    var ShapeType;
-    (function (ShapeType) {
-        ShapeType["Rectangle"] = "rectangle";
-        ShapeType["Polygon"] = "polygon";
-        ShapeType["Circle"] = "circle";
-        ShapeType["Ellipse"] = "ellipse";
-        ShapeType["RoundRect"] = "roundRect";
-        ShapeType["Path"] = "path";
-    })(ShapeType || (ShapeType = {}));
-    var LINE_CAP;
-    (function (LINE_CAP) {
-        LINE_CAP["BUTT"] = "butt";
-        LINE_CAP["ROUND"] = "round";
-        LINE_CAP["SQUARE"] = "square";
-    })(LINE_CAP || (LINE_CAP = {}));
-    var LINE_JOIN;
-    (function (LINE_JOIN) {
-        LINE_JOIN["MITER"] = "miter";
-        LINE_JOIN["BEVEL"] = "bevel";
-        LINE_JOIN["ROUND"] = "round";
-    })(LINE_JOIN || (LINE_JOIN = {}));
-    var EventPhase;
-    (function (EventPhase) {
-        EventPhase["NONE"] = "none";
-        EventPhase["CAPTURING"] = "capturing";
-        EventPhase["AT_TARGET"] = "atTarget";
-        EventPhase["BUBBLING"] = "bubbling";
-    })(EventPhase || (EventPhase = {}));
 
     const eventMap = {
         pointermove: "mousemove",
@@ -1326,10 +1402,10 @@
             this.stage.setHitArea(new Rectangle(0, 0, this.renderer.width, this.renderer.height));
             this.render();
         }
-        render() {
+        render = () => {
             this.renderer.render(this.stage);
-            requestAnimationFrame(this.render.bind(this));
-        }
+            requestAnimationFrame(this.render);
+        };
         clear() {
             this.stage.removeChildren();
         }

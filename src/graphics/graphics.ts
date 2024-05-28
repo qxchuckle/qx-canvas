@@ -86,7 +86,7 @@ export class Graphics extends Group {
   }
 
   // 设置描边样式，开始描边
-  public beginLine(style: Partial<LineStyleType & FillStyleType> = {}) {
+  public beginLine(style: Partial<LineStyleType> = {}) {
     this.lineStyle.set(style);
     this.lineStyle.visible = style.visible ?? true;
     this.currentPath.pushState(this.lineStyle.clone());

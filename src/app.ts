@@ -34,10 +34,10 @@ export class App<T extends IContext["ctx"] = CanvasRenderingContext2D> {
   }
 
   // 持续渲染
-  private render() {
+  private render = () => {
     this.renderer.render(this.stage);
-    requestAnimationFrame(this.render.bind(this));
-  }
+    requestAnimationFrame(this.render);
+  };
 
   // 清空舞台
   clear() {

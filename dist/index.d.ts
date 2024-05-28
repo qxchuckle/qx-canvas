@@ -22,6 +22,15 @@ declare enum EventPhase {
     AT_TARGET = "atTarget",
     BUBBLING = "bubbling"
 }
+declare enum LifecycleKey {
+    BeforeMount = "beforeMount",
+    Mounted = "mounted",
+    BeforeRender = "beforeRender",
+    Rendering = "rendering",
+    Rendered = "rendered",
+    BeforeUnmount = "beforeUnmount",
+    Unmounted = "unmounted"
+}
 
 interface IAppOptions {
     canvas: HTMLCanvasElement;
@@ -178,7 +187,7 @@ declare class Graphics extends Group {
     private setCtxStyle;
     protected renderSelf(renderer: CanvasRenderer): this;
     beginFill(style?: Partial<FillStyleType>): this;
-    beginLine(style?: Partial<LineStyleType & FillStyleType>): this;
+    beginLine(style?: Partial<LineStyleType>): this;
     private drawShape;
     contains(p: Point): boolean;
     drawRect(x: number, y: number, width: number, height: number): this;
@@ -307,6 +316,16 @@ declare abstract class Node extends EventClient {
 }
 
 declare class Group extends Node {
+    private lifecycleHooks;
+    private addLifecycleHook;
+    onBeforeMount(handler: (item: this) => void): this;
+    onMounted(handler: (item: this) => void): this;
+    onBeforeRender(handler: (item: this, renderer: CanvasRenderer) => void): this;
+    onRendering(handler: (item: this, renderer: CanvasRenderer) => void): this;
+    onRendered(handler: (item: this, renderer: CanvasRenderer) => void): this;
+    onBeforeUnmount(handler: (item: this) => void): this;
+    onUnmounted(handler: (item: this) => void): this;
+    protected callLifecycleHook(key: LifecycleKey, item: this, renderer?: CanvasRenderer): void;
     renderCanvas(renderer: CanvasRenderer): this | undefined;
     protected renderSelf(renderer: CanvasRenderer): this;
     protected renderChildren(renderer: CanvasRenderer): this;

@@ -58,6 +58,8 @@ export class Transform {
   };
 
   private onSkewChange = (skewX: number, skewY: number) => {
+    skewX *= DEG_TO_RAD;
+    skewY *= DEG_TO_RAD;
     this.skewMatrix.set(
       Math.cos(skewY),
       Math.sin(skewY),

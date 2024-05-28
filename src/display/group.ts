@@ -4,7 +4,7 @@ import { Node } from "./node";
 import { nextTick } from "../utils";
 
 export class Group extends Node {
-  lifecycleHooks: LifecycleHooks = new Map();
+  private lifecycleHooks: LifecycleHooks = new Map();
 
   // 添加生命周期钩子
   private addLifecycleHook(
