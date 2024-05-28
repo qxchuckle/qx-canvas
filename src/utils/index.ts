@@ -39,3 +39,10 @@ export function isIntersect(
   // 如果交点在射线右侧，返回 true
   return x > ox;
 }
+// 判断两个数组的元素是否一样
+export function isSameArray(arr1: any[], arr2: any[]) {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+  return arr1.every((item, index) => item === arr2[index]);
+}

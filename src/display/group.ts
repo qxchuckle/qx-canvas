@@ -2,10 +2,6 @@ import { CanvasRenderer } from "../renderer";
 import { Node } from "./node";
 
 export class Group extends Node {
-  public parent: Group | null = null;
-  // 子节点列表
-  public readonly children: Group[] = [];
-
   // 渲染自身，及其子节点
   public renderCanvas(renderer: CanvasRenderer) {
     // 如果不可见，直接返回
@@ -36,8 +32,7 @@ export class Group extends Node {
     return this;
   }
 
-  // 添加子节点
-  public add(child: Group) {
+  private addOneChild(child: this) {
     // 如果子节点已经有父节点，先从父节点移除
     child.parent?.remove(child);
     // 添加到当前节点
@@ -46,11 +41,22 @@ export class Group extends Node {
     child.parent = this;
     // 标记未排序
     this.sorted = false;
+  }
+
+  // 添加子节点
+  public add(child: this | this[]) {
+    if (Array.isArray(child)) {
+      for (let i = 0; i < child.length; i++) {
+        this.addOneChild(child[i]);
+      }
+    } else {
+      this.addOneChild(child);
+    }
     return this;
   }
 
   // 移除子节点
-  public remove(child: Group) {
+  public remove(child: this) {
     const index = this.children.indexOf(child);
     if (index !== -1) {
       this.children.splice(index, 1);

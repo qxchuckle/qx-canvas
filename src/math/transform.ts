@@ -1,15 +1,16 @@
 import { matrixMultiply } from "../utils";
+import { DEG_TO_RAD } from "./constant";
 import { Matrix } from "./matrix";
 import { ObservablePoint } from "./point";
 
 // 变换矩阵的封装类
 export class Transform {
-  private localMatrix = new Matrix(); // 相对于父节点的变换矩阵，但注意坐标系仍然是画布
-  public worldMatrix = new Matrix(); // 累加了父变换矩阵后，实际相对于世界坐标系的变换矩阵
-  public position: ObservablePoint; // 位置，影响平移，即 tx, ty
-  public pivot: ObservablePoint; // 旋转锚点，影响旋转，即 a, b, c, d
-  public scale: ObservablePoint; // 缩放
-  public skew: ObservablePoint; // 斜切
+  private readonly localMatrix = new Matrix(); // 相对于父节点的变换矩阵，但注意坐标系仍然是画布
+  public readonly worldMatrix = new Matrix(); // 累加了父变换矩阵后，实际相对于世界坐标系的变换矩阵
+  public readonly position: ObservablePoint; // 位置，影响平移，即 tx, ty
+  public readonly pivot: ObservablePoint; // 旋转锚点，影响旋转，即 a, b, c, d
+  public readonly scale: ObservablePoint; // 缩放
+  public readonly skew: ObservablePoint; // 斜切
   private _rotate = 0; // 旋转角度，弧度制
   private rotateMatrix = new Matrix(); // 旋转矩阵
   private skewMatrix = new Matrix(); // 斜切矩阵
@@ -35,7 +36,7 @@ export class Transform {
 
   // 设置旋转角度时，更新旋转矩阵
   set rotate(r: number) {
-    this._rotate = r;
+    this._rotate = r * DEG_TO_RAD;
     this.rotateMatrix.set(
       Math.cos(this.rotate),
       Math.sin(this.rotate),

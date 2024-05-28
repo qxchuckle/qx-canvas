@@ -45,6 +45,10 @@ export class Graphics extends Group {
       if (data.fillStyle.visible) {
         ctx.fillStyle = data.fillStyle.color;
         ctx.globalAlpha = data.fillStyle.alpha * this.worldAlpha;
+        ctx.shadowOffsetX = data.fillStyle.shadowOffsetX;
+        ctx.shadowOffsetY = data.fillStyle.shadowOffsetY;
+        ctx.shadowBlur = data.fillStyle.shadowBlur;
+        ctx.shadowColor = data.fillStyle.shadowColor;
       }
       if (data.lineStyle.visible) {
         ctx.lineWidth = data.lineStyle.width;
@@ -52,6 +56,11 @@ export class Graphics extends Group {
         ctx.lineJoin = data.lineStyle.join;
         ctx.strokeStyle = data.lineStyle.color;
         ctx.globalAlpha = data.lineStyle.alpha * this.worldAlpha;
+        ctx.shadowOffsetX = data.lineStyle.shadowOffsetX;
+        ctx.shadowOffsetY = data.lineStyle.shadowOffsetY;
+        ctx.shadowBlur = data.lineStyle.shadowBlur;
+        ctx.shadowColor = data.lineStyle.shadowColor;
+        ctx.setLineDash(data.lineStyle.lineDash);
       }
       data.shape.render(renderer, data, this.worldAlpha);
       ctx.restore();
@@ -182,11 +191,13 @@ export class Graphics extends Group {
     return this;
   }
 
+  // 结束填充
   endFill() {
     this.beginFill({ visible: false });
     return this;
   }
 
+  // 结束描边
   endLine() {
     this.beginLine({ visible: false });
     return this;

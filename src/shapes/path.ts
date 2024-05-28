@@ -121,6 +121,11 @@ export class Path extends Shape {
         ctx.lineJoin = this.lineStyle.join;
         ctx.strokeStyle = this.lineStyle.color;
         ctx.globalAlpha = this.lineStyle.alpha * worldAlpha;
+        ctx.shadowOffsetX = this.lineStyle.shadowOffsetX;
+        ctx.shadowOffsetY = this.lineStyle.shadowOffsetY;
+        ctx.shadowBlur = this.lineStyle.shadowBlur;
+        ctx.shadowColor = this.lineStyle.shadowColor;
+        ctx.setLineDash(this.lineStyle.lineDash);
       }
     }
     if (style.fillStyle) {
@@ -129,6 +134,10 @@ export class Path extends Shape {
       if (this.fillStyle.visible) {
         ctx.fillStyle = this.fillStyle.color;
         ctx.globalAlpha = this.fillStyle.alpha * worldAlpha;
+        ctx.shadowOffsetX = this.fillStyle.shadowOffsetX;
+        ctx.shadowOffsetY = this.fillStyle.shadowOffsetY;
+        ctx.shadowBlur = this.fillStyle.shadowBlur;
+        ctx.shadowColor = this.fillStyle.shadowColor;
       }
     }
     this.closePath = style.closePath ?? false;

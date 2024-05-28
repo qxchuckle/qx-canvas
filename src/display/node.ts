@@ -13,8 +13,8 @@ export abstract class Node extends EventClient {
   public cursor: Cursor = "auto"; // 鼠标样式
   public hitArea: Shape | null = null; // 节点图形、碰撞区域
   protected sorted = false; // 记录是否已按照 zIndex 排序
-  abstract parent: Node | null; // 父节点
-  abstract readonly children: Node[]; // 子节点
+  public parent: this | null = null; // 父节点
+  public readonly children: this[] = []; // 子节点
   public id: string = ""; // 节点唯一标识
   public class: string[] = []; // 节点类名
 
@@ -164,7 +164,7 @@ export abstract class Node extends EventClient {
   }
 
   // 查找子元素符合ID的节点
-  public findById(id: string): Node | null {
+  public findById(id: string): this | null {
     if (this.id === id) {
       return this;
     }
@@ -178,8 +178,8 @@ export abstract class Node extends EventClient {
   }
 
   // 查找子元素符合类名的节点
-  public findByClass(className: string): Node[] {
-    const result: Node[] = [];
+  public findByClass(className: string): this[] {
+    const result: this[] = [];
     if (this.class.includes(className)) {
       result.push(this);
     }

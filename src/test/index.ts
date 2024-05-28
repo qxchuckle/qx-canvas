@@ -13,22 +13,29 @@ const a = new QxCanvas.Graphics()
     color: "blue",
   })
   .drawRect(300, 50, 50, 50)
-  .setZIndex(10);
-a.transform.rotate = 45 * (Math.PI / 180);
-a.transform.scale.set(2, 2);
+  .setZIndex(10)
+  .setRotation(45)
+  .setScale(2, 2)
+  .setAlpha(0.6)
+  .addEventListener("click", (e) => {
+    console.log(e.clone());
+  })
+  .setCursor("pointer");
 
-const b = new QxCanvas.Graphics().beginFill().drawRect(200, 50, 100, 100);
-b.transform.rotate = 45 * (Math.PI / 180);
-b.transform.pivot.set(200, 50);
-b.addEventListener("click", (e) => {
-  console.log(e.clone());
-});
+const b = new QxCanvas.Graphics()
+  .beginFill({
+    shadowOffsetX: 5,
+    shadowOffsetY: 5,
+    shadowBlur: 5,
+  })
+  .drawRect(200, 50, 100, 100)
+  .setRotation(45)
+  .setPivot(200, 50)
+  .addEventListener("click", (e) => {
+    console.log(e.clone());
+  });
 
-a.setAlpha(0.6).addEventListener("click", (e) => {
-  console.log(e.clone());
-});
-
-a.add(b).setCursor("pointer");
+a.add(b);
 
 app.stage.add(a);
 
@@ -96,31 +103,29 @@ const rt = new QxCanvas.Graphics()
     color: "black",
   })
   .drawRoundRect(200, 200, 100, 50, 20)
-  .setCursor("pointer");
+  .setCursor("pointer")
+  .addEventListener("click", (e) => {
+    console.log(e.clone());
+  })
+  .addEventListener("mousedown", (e) => {
+    const mouseDownPoint = e.global.clone();
+    const { x, y } = rt.transform.position;
+    const onMove = (e: any) => {
+      const movePoint = e.global.clone();
+      const dx = movePoint.x - mouseDownPoint.x;
+      const dy = movePoint.y - mouseDownPoint.y;
+      rt.setPosition(x + dx, y + dy);
+    };
+    app.stage.addEventListener("mousemove", onMove);
+    rt.addEventListener(
+      "mouseup",
+      () => {
+        app.stage.removeEventListener("mousemove", onMove);
+      },
+      { once: true }
+    );
+  });
 app.stage.add(rt);
-
-rt.addEventListener("click", (e) => {
-  console.log(e.clone());
-});
-
-rt.addEventListener("mousedown", (e) => {
-  const mouseDownPoint = e.global.clone();
-  const { x, y } = rt.transform.position;
-  const onMove = (e: any) => {
-    const movePoint = e.global.clone();
-    const dx = movePoint.x - mouseDownPoint.x;
-    const dy = movePoint.y - mouseDownPoint.y;
-    rt.setPosition(x + dx, y + dy);
-  };
-  app.stage.addEventListener("mousemove", onMove);
-  rt.addEventListener(
-    "mouseup",
-    () => {
-      app.stage.removeEventListener("mousemove", onMove);
-    },
-    { once: true }
-  );
-});
 
 // 绘制多边形
 const p = new QxCanvas.Graphics()
@@ -132,31 +137,40 @@ const p = new QxCanvas.Graphics()
     color: "yellow",
   })
   .drawPolygon([150, 100, 200, 200, 100, 200])
-  .setCursor("pointer");
-p.addEventListener("mousedown", (e) => {
-  const mouseDownPoint = e.global.clone();
-  const { x, y } = p.transform.position;
-  const onMove = (e: any) => {
-    const movePoint = e.global.clone();
-    const dx = movePoint.x - mouseDownPoint.x;
-    const dy = movePoint.y - mouseDownPoint.y;
-    p.setPosition(x + dx, y + dy);
-  };
-  app.stage.addEventListener("mousemove", onMove);
-  p.addEventListener(
-    "mouseup",
-    () => {
-      app.stage.removeEventListener("mousemove", onMove);
-    },
-    { once: true }
-  );
-});
+  .setCursor("pointer")
+  .addEventListener("mousedown", (e) => {
+    const mouseDownPoint = e.global.clone();
+    const { x, y } = p.transform.position;
+    const onMove = (e: any) => {
+      const movePoint = e.global.clone();
+      const dx = movePoint.x - mouseDownPoint.x;
+      const dy = movePoint.y - mouseDownPoint.y;
+      p.setPosition(x + dx, y + dy);
+    };
+    app.stage.addEventListener("mousemove", onMove);
+    p.addEventListener(
+      "mouseup",
+      () => {
+        app.stage.removeEventListener("mousemove", onMove);
+      },
+      { once: true }
+    );
+  });
 app.stage.add(p);
 
 // 自由绘制线段
 const s = new QxCanvas.Graphics()
-  .beginLine({ width: 2, color: "green" })
-  .beginFill({ color: "pink" })
+  .beginLine({
+    width: 2,
+    color: "green",
+    lineDash: [12, 3, 3],
+  })
+  .beginFill({
+    color: "pink",
+    shadowOffsetX: 5,
+    shadowOffsetY: 5,
+    shadowBlur: 5,
+  })
   .moveTo(100, 100)
   .lineTo(200, 200)
   .lineTo(500, 200)
@@ -174,8 +188,7 @@ app.stage.add(s);
 
 // 自由绘制线段
 const s1 = new QxCanvas.Graphics();
-app.stage.add(s1);
-app.stage.addEventListener("mousedown", (e) => {
+app.stage.add(s1).addEventListener("mousedown", (e) => {
   // s1.beginPath();
   s1.beginLine({ width: 2, color: color.value });
   const onMove = (e: any) => {
