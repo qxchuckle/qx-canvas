@@ -9,12 +9,14 @@ export abstract class Node extends EventClient {
   protected alpha = 1; // 透明度
   protected worldAlpha = 1; // 世界透明度，由父节点透明度计算得到
   private _zIndex = 0; // 层级
-  public transform = new Transform(); // 变换对象
+  public readonly transform = new Transform(); // 变换对象
   public cursor: Cursor = "auto"; // 鼠标样式
   public hitArea: Shape | null = null; // 节点图形、碰撞区域
   protected sorted = false; // 记录是否已按照 zIndex 排序
   abstract parent: Node | null; // 父节点
   abstract readonly children: Node[]; // 子节点
+  public id: string = ""; // 节点唯一标识
+  public class: string[] = []; // 节点类名
 
   get zIndex(): number {
     return this._zIndex;
@@ -46,6 +48,23 @@ export abstract class Node extends EventClient {
   }
   setHitArea(hitArea: Shape) {
     this.hitArea = hitArea;
+    return this;
+  }
+  setId(id: string) {
+    this.id = id;
+    return this;
+  }
+  setClass(className: string) {
+    this.class = className.split(" ");
+    return this;
+  }
+  addClass(className: string) {
+    this.class.push(...className.split(" "));
+    return this;
+  }
+  removeClass(className: string) {
+    const classes = className.split(" ");
+    this.class = this.class.filter((c) => !classes.includes(c));
     return this;
   }
 
@@ -116,6 +135,7 @@ export abstract class Node extends EventClient {
     } else {
       this.on(realType, listener);
     }
+    return this;
   }
 
   // 移除事件监听器
@@ -126,8 +146,10 @@ export abstract class Node extends EventClient {
   ) {
     const realType = capture ? `${type}_capture` : `${type}_bubble`;
     this.off(realType, listener);
+    return this;
   }
 
+  // 解析事件选项
   private analyzeEventOptions(options?: boolean | EventOptions): EventOptions {
     if (typeof options === "boolean") {
       return {
@@ -139,5 +161,31 @@ export abstract class Node extends EventClient {
       capture: options?.capture ?? false,
       once: options?.once ?? false,
     };
+  }
+
+  // 查找子元素符合ID的节点
+  public findById(id: string): Node | null {
+    if (this.id === id) {
+      return this;
+    }
+    for (let i = 0; i < this.children.length; i++) {
+      const node = this.children[i].findById(id);
+      if (node) {
+        return node;
+      }
+    }
+    return null;
+  }
+
+  // 查找子元素符合类名的节点
+  public findByClass(className: string): Node[] {
+    const result: Node[] = [];
+    if (this.class.includes(className)) {
+      result.push(this);
+    }
+    for (let i = 0; i < this.children.length; i++) {
+      result.push(...this.children[i].findByClass(className));
+    }
+    return result;
   }
 }
