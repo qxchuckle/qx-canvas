@@ -27,6 +27,10 @@ const b = new QxCanvas.Graphics()
     shadowOffsetX: 5,
     shadowOffsetY: 5,
     shadowBlur: 5,
+    alpha: 0.5,
+  })
+  .beginLine({
+    alpha: 1,
   })
   .drawRect(200, 50, 100, 100)
   .setRotation(45)
@@ -170,6 +174,7 @@ const s = new QxCanvas.Graphics()
     shadowOffsetX: 5,
     shadowOffsetY: 5,
     shadowBlur: 5,
+    alpha: 0.1,
   })
   .moveTo(100, 100)
   .lineTo(200, 200)
@@ -177,7 +182,7 @@ const s = new QxCanvas.Graphics()
   .closePath()
   .moveTo(200, 400)
   .lineTo(500, 600)
-  .beginLine({ width: 6, color: "red" })
+  .beginLine({ width: 6, color: "red", alpha: 0.5 })
   .beginFill({ color: "blue" })
   .moveTo(200, 50)
   .lineTo(150, 100)

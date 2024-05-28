@@ -1,7 +1,7 @@
 import { CanvasRenderer } from "../renderer";
 import { Point } from "../math";
 import { ShapeType } from "../types";
-import { Shape } from "./shape";
+import { SetCtxStyle, Shape } from "./shape";
 import { GraphicsData } from "../graphics";
 
 export class Ellipse extends Shape {
@@ -27,15 +27,22 @@ export class Ellipse extends Shape {
     );
   }
 
-  public render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number): void {
+  public render(
+    renderer: CanvasRenderer,
+    data: GraphicsData,
+    worldAlpha: number,
+    setCtxStyle: SetCtxStyle
+  ): void {
     const ctx = renderer.ctx;
     const fillStyle = data.fillStyle;
     const lineStyle = data.lineStyle;
     ctx.ellipse(this.x, this.y, this.radiusX, this.radiusY, 0, 0, Math.PI * 2);
     if (fillStyle.visible) {
+      setCtxStyle(ctx, data, true);
       ctx.fill();
     }
     if (lineStyle.visible) {
+      setCtxStyle(ctx, data, false);
       ctx.stroke();
     }
   }

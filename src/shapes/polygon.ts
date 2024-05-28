@@ -1,7 +1,7 @@
 import { CanvasRenderer } from "../renderer";
 import { Point } from "../math";
 import { ShapeType } from "../types";
-import { Shape } from "./shape";
+import { SetCtxStyle, Shape } from "./shape";
 import { GraphicsData } from "../graphics";
 import { isIntersect } from "../utils";
 
@@ -62,7 +62,8 @@ export class Polygon extends Shape {
   render(
     renderer: CanvasRenderer,
     data: GraphicsData,
-    worldAlpha: number
+    worldAlpha: number,
+    setCtxStyle: SetCtxStyle
   ): void {
     const ctx = renderer.ctx;
     const fillStyle = data.fillStyle;
@@ -81,9 +82,11 @@ export class Polygon extends Shape {
       ctx.closePath();
     }
     if (fillStyle.visible) {
+      setCtxStyle(ctx, data, true);
       ctx.fill();
     }
     if (lineStyle.visible) {
+      setCtxStyle(ctx, data, false);
       ctx.stroke();
     }
   }

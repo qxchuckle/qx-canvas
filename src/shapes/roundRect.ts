@@ -1,7 +1,7 @@
 import { CanvasRenderer } from "../renderer";
 import { Point } from "../math";
 import { ShapeType } from "../types";
-import { Shape } from "./shape";
+import { SetCtxStyle, Shape } from "./shape";
 import { GraphicsData } from "../graphics";
 
 export class RoundRect extends Shape {
@@ -81,15 +81,17 @@ export class RoundRect extends Shape {
     return true;
   }
 
-  render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number) {
+  render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number, setCtxStyle: SetCtxStyle) {
     const ctx = renderer.ctx;
     ctx.roundRect(this.x, this.y, this.width, this.height, this.radius);
     const fillStyle = data.fillStyle;
     const lineStyle = data.lineStyle;
     if (fillStyle.visible) {
+      setCtxStyle(ctx, data, true);
       ctx.fill();
     }
     if (lineStyle.visible) {
+      setCtxStyle(ctx, data, false);
       ctx.stroke();
     }
   }

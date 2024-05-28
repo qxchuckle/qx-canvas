@@ -1,7 +1,7 @@
 import { CanvasRenderer } from "../renderer";
 import { Point } from "../math";
 import { ShapeType } from "../types";
-import { Shape } from "./shape";
+import { SetCtxStyle, Shape } from "./shape";
 import { GraphicsData } from "../graphics";
 
 // 矩形
@@ -35,14 +35,21 @@ export class Rectangle extends Shape {
     }
   }
 
-  render(renderer: CanvasRenderer, data: GraphicsData, worldAlpha: number) {
+  render(
+    renderer: CanvasRenderer,
+    data: GraphicsData,
+    worldAlpha: number,
+    setCtxStyle: SetCtxStyle
+  ) {
     const ctx = renderer.ctx;
     const fillStyle = data.fillStyle;
     const lineStyle = data.lineStyle;
     if (fillStyle.visible) {
+      setCtxStyle(ctx, data, true);
       ctx.fillRect(this.x, this.y, this.width, this.height);
     }
     if (lineStyle.visible) {
+      setCtxStyle(ctx, data, false);
       ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
   }

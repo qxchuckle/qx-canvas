@@ -113,39 +113,31 @@ export class Path extends Shape {
       return;
     }
     if (style.lineStyle) {
-      this.stroke(ctx);
+      // 在更新样式前，先用现在都样式画出目前的路径
+      this.stroke(ctx, worldAlpha);
       this.lineStyle.set(style.lineStyle);
-      if (this.lineStyle.visible) {
-        ctx.lineWidth = this.lineStyle.width;
-        ctx.lineCap = this.lineStyle.cap;
-        ctx.lineJoin = this.lineStyle.join;
-        ctx.strokeStyle = this.lineStyle.color;
-        ctx.globalAlpha = this.lineStyle.alpha * worldAlpha;
-        ctx.shadowOffsetX = this.lineStyle.shadowOffsetX;
-        ctx.shadowOffsetY = this.lineStyle.shadowOffsetY;
-        ctx.shadowBlur = this.lineStyle.shadowBlur;
-        ctx.shadowColor = this.lineStyle.shadowColor;
-        ctx.setLineDash(this.lineStyle.lineDash);
-      }
     }
     if (style.fillStyle) {
-      this.fill(ctx);
+      // 在更新样式前，先用现在都样式画出目前的路径
+      this.fill(ctx, worldAlpha);
       this.fillStyle.set(style.fillStyle);
-      if (this.fillStyle.visible) {
-        ctx.fillStyle = this.fillStyle.color;
-        ctx.globalAlpha = this.fillStyle.alpha * worldAlpha;
-        ctx.shadowOffsetX = this.fillStyle.shadowOffsetX;
-        ctx.shadowOffsetY = this.fillStyle.shadowOffsetY;
-        ctx.shadowBlur = this.fillStyle.shadowBlur;
-        ctx.shadowColor = this.fillStyle.shadowColor;
-      }
     }
     this.closePath = style.closePath ?? false;
   }
 
   // 当前路径描边
-  private stroke(ctx: CanvasRenderingContext2D) {
+  private stroke(ctx: CanvasRenderingContext2D, worldAlpha: number) {
     if (this.lineStyle.visible && this.points.length > 0) {
+      ctx.lineWidth = this.lineStyle.width;
+      ctx.lineCap = this.lineStyle.cap;
+      ctx.lineJoin = this.lineStyle.join;
+      ctx.strokeStyle = this.lineStyle.color;
+      ctx.globalAlpha = this.lineStyle.alpha * worldAlpha;
+      ctx.shadowOffsetX = this.lineStyle.shadowOffsetX;
+      ctx.shadowOffsetY = this.lineStyle.shadowOffsetY;
+      ctx.shadowBlur = this.lineStyle.shadowBlur;
+      ctx.shadowColor = this.lineStyle.shadowColor;
+      ctx.setLineDash(this.lineStyle.lineDash);
       if (this.closePath) {
         this.path2D.linePath.closePath();
       }
@@ -155,8 +147,14 @@ export class Path extends Shape {
   }
 
   // 当前路径填充
-  private fill(ctx: CanvasRenderingContext2D) {
+  private fill(ctx: CanvasRenderingContext2D, worldAlpha: number) {
     if (this.fillStyle.visible && this.points.length > 0) {
+      ctx.fillStyle = this.fillStyle.color;
+      ctx.globalAlpha = this.fillStyle.alpha * worldAlpha;
+      ctx.shadowOffsetX = this.fillStyle.shadowOffsetX;
+      ctx.shadowOffsetY = this.fillStyle.shadowOffsetY;
+      ctx.shadowBlur = this.fillStyle.shadowBlur;
+      ctx.shadowColor = this.fillStyle.shadowColor;
       ctx.fill(this.path2D.fillPath);
     }
     this.path2D.fillPath = new Path2D();
@@ -203,8 +201,8 @@ export class Path extends Shape {
     }
     // 应用最后一次状态
     if (this.lastStateIndex >= 0) {
-      this.stroke(ctx);
-      this.fill(ctx);
+      this.stroke(ctx, worldAlpha);
+      this.fill(ctx, worldAlpha);
     }
     this.lineStyle.reset();
     this.fillStyle.reset();

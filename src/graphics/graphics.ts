@@ -30,6 +30,35 @@ export class Graphics extends Group {
     this.drawShape(this.currentPath);
   }
 
+  // 设置上下文样式
+  private setCtxStyle = (
+    ctx: CanvasRenderingContext2D,
+    data: GraphicsData,
+    isFill: boolean
+  ) => {
+    // 设置样式
+    if (data.fillStyle.visible && isFill) {
+      ctx.fillStyle = data.fillStyle.color;
+      ctx.globalAlpha = data.fillStyle.alpha * this.worldAlpha;
+      ctx.shadowOffsetX = data.fillStyle.shadowOffsetX;
+      ctx.shadowOffsetY = data.fillStyle.shadowOffsetY;
+      ctx.shadowBlur = data.fillStyle.shadowBlur;
+      ctx.shadowColor = data.fillStyle.shadowColor;
+    }
+    if (data.lineStyle.visible && !isFill) {
+      ctx.lineWidth = data.lineStyle.width;
+      ctx.lineCap = data.lineStyle.cap;
+      ctx.lineJoin = data.lineStyle.join;
+      ctx.strokeStyle = data.lineStyle.color;
+      ctx.globalAlpha = data.lineStyle.alpha * this.worldAlpha;
+      ctx.shadowOffsetX = data.lineStyle.shadowOffsetX;
+      ctx.shadowOffsetY = data.lineStyle.shadowOffsetY;
+      ctx.shadowBlur = data.lineStyle.shadowBlur;
+      ctx.shadowColor = data.lineStyle.shadowColor;
+      ctx.setLineDash(data.lineStyle.lineDash);
+    }
+  };
+
   // 渲染自身
   protected renderSelf(renderer: CanvasRenderer) {
     const ctx = renderer.ctx;
@@ -41,28 +70,7 @@ export class Graphics extends Group {
       const data = this.graphicsDataList[i];
       ctx.save();
       ctx.beginPath();
-      // 设置样式
-      if (data.fillStyle.visible) {
-        ctx.fillStyle = data.fillStyle.color;
-        ctx.globalAlpha = data.fillStyle.alpha * this.worldAlpha;
-        ctx.shadowOffsetX = data.fillStyle.shadowOffsetX;
-        ctx.shadowOffsetY = data.fillStyle.shadowOffsetY;
-        ctx.shadowBlur = data.fillStyle.shadowBlur;
-        ctx.shadowColor = data.fillStyle.shadowColor;
-      }
-      if (data.lineStyle.visible) {
-        ctx.lineWidth = data.lineStyle.width;
-        ctx.lineCap = data.lineStyle.cap;
-        ctx.lineJoin = data.lineStyle.join;
-        ctx.strokeStyle = data.lineStyle.color;
-        ctx.globalAlpha = data.lineStyle.alpha * this.worldAlpha;
-        ctx.shadowOffsetX = data.lineStyle.shadowOffsetX;
-        ctx.shadowOffsetY = data.lineStyle.shadowOffsetY;
-        ctx.shadowBlur = data.lineStyle.shadowBlur;
-        ctx.shadowColor = data.lineStyle.shadowColor;
-        ctx.setLineDash(data.lineStyle.lineDash);
-      }
-      data.shape.render(renderer, data, this.worldAlpha);
+      data.shape.render(renderer, data, this.worldAlpha, this.setCtxStyle);
       ctx.restore();
     }
     ctx.restore();
