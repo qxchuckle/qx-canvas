@@ -7,7 +7,7 @@
 安装：
 
 ```bash
-npm i qx-canvas -S
+pnpm i qx-canvas -S
 ```
 
 将 `canvas` 元素传入 `App` 类，即可创建一个 `App` 实例。`App` 用于管理整个 canvas 及其事件系统。
@@ -33,15 +33,16 @@ const rect1 = new QxCanvas.Graphics()
   .beginFill({
     color: "blue",
   })
-  .drawRect(0, 0, 100, 100)
-  .setRotation(45)
-  .setScale(2, 2)
-  .setAlpha(0.6)
-  .setCursor("pointer");
-rect1.addEventListener("click", (e) => {
-  // 若你需要在异步而非同步环境中使用事件对象，需要调用 clone 方法，以拷贝其副本。
-  console.log(e.clone());
-});
+  .drawRect(200, 0, 100, 100)
+  .setPivot(200, 0) // 设置变换中心
+  .setRotation(45) // 顺时针旋转45度
+  .setScale(2, 2) // 放大两倍
+  .setAlpha(0.5) // 透明度
+  .setCursor("pointer") // 鼠标样式
+  .addEventListener("click", (e) => {
+    // 若你需要在异步环境中使用事件对象，需要调用 clone 方法，以拷贝其副本。
+    console.log(e.clone());
+  });
 app.stage.add(rect1);
 ```
 
@@ -54,8 +55,9 @@ const circle1 = new QxCanvas.Graphics()
   .beginLine({
     width: 5,
   })
-  .drawCircle(200, 200, 50);
-rect1.add(circle1);
+  .setPosition(0, 100) // 设置位置偏移量
+  .drawCircle(200, 0, 20);
+rect1.add(circle1); // 作为rect1的子节点
 ```
 
 在同一个组中，其透明度、变换(旋转、缩放等)是共享叠加的，如：父节点的变换叠加上子节点自身的局部变换，形成子节点最终的全局变换效果。
@@ -65,9 +67,9 @@ rect1.add(circle1);
 ```ts
 const path1 = new QxCanvas.Graphics()
   .beginLine()
-  .moveTo(0, 0)
-  .lineTo(100, 100)
-  .lineTo(200, 0)
+  .moveTo(100, 100)
+  .lineTo(200, 200)
+  .lineTo(300, 100)
   .closePath();
 app.stage.add(path1);
 ```

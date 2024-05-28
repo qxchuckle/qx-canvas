@@ -24,6 +24,6 @@
     "tslib": "^2.6.2"
   },
   "dependencies": {
-    "qx-canvas": "^1.0.0"
+    "qx-canvas": "^1.0.1"
   }
 }
