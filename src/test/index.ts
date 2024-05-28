@@ -13,7 +13,7 @@ const a = new QxCanvas.Graphics()
     color: "blue",
   })
   .drawRect(300, 50, 50, 50)
-  .setZIndex(10)
+  // .setZIndex(10)
   .setRotation(45)
   .setScale(2, 2)
   .setAlpha(0.6)
@@ -43,7 +43,7 @@ a.add(b);
 
 app.stage.add(a);
 
-// 实现一个拖动
+// 实现拖动
 a.addEventListener("mousedown", (e) => {
   const mouseDownPoint = e.global.clone();
   const { x, y } = a.transform.position;
@@ -54,7 +54,7 @@ a.addEventListener("mousedown", (e) => {
     a.setPosition(x + dx, y + dy);
   };
   app.stage.addEventListener("mousemove", onMove);
-  a.addEventListener(
+  app.stage.addEventListener(
     "mouseup",
     () => {
       app.stage.removeEventListener("mousemove", onMove);
@@ -121,7 +121,7 @@ const rt = new QxCanvas.Graphics()
       rt.setPosition(x + dx, y + dy);
     };
     app.stage.addEventListener("mousemove", onMove);
-    rt.addEventListener(
+    app.stage.addEventListener(
       "mouseup",
       () => {
         app.stage.removeEventListener("mousemove", onMove);
@@ -152,7 +152,7 @@ const p = new QxCanvas.Graphics()
       p.setPosition(x + dx, y + dy);
     };
     app.stage.addEventListener("mousemove", onMove);
-    p.addEventListener(
+    app.stage.addEventListener(
       "mouseup",
       () => {
         app.stage.removeEventListener("mousemove", onMove);
@@ -164,6 +164,7 @@ app.stage.add(p);
 
 // 自由绘制线段
 const s = new QxCanvas.Graphics()
+  .setCursor("pointer")
   .beginLine({
     width: 2,
     color: "green",
@@ -192,28 +193,28 @@ const s = new QxCanvas.Graphics()
 app.stage.add(s);
 
 // 生命周期测试
-s.onBeforeMount((item) => {
-  console.log("before mount");
-})
-  .onMounted((item) => {
-    console.log("mounted");
-  })
-  .onBeforeRender((item, renderer) => {
-    console.log("before render");
-  })
-  .onRendering((item, renderer) => {
-    console.log("rendering");
-  })
-  .onRendered((item, renderer) => {
-    console.log("after render");
-    app.stage.remove(s);
-  })
-  .onBeforeUnmount((item) => {
-    console.log("before unmount");
-  })
-  .onUnmounted((item) => {
-    console.log("unmounted");
-  });
+// s.onBeforeMount((item) => {
+//   console.log("before mount");
+// })
+//   .onMounted((item) => {
+//     console.log("mounted");
+//   })
+//   .onBeforeRender((item, renderer) => {
+//     console.log("before render");
+//   })
+//   .onRendering((item, renderer) => {
+//     console.log("rendering");
+//   })
+//   .onRendered((item, renderer) => {
+//     console.log("after render");
+//     app.stage.remove(s);
+//   })
+//   .onBeforeUnmount((item) => {
+//     console.log("before unmount");
+//   })
+//   .onUnmounted((item) => {
+//     console.log("unmounted");
+//   });
 
 // 自由绘制线段
 const s1 = new QxCanvas.Graphics();
