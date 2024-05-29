@@ -95,6 +95,9 @@ const app = new QxCanvas.App({
 export interface IAppOptions {
   // 传入的canvas元素
   canvas: HTMLCanvasElement;
+  // canvas 元素宽高
+  width?: number;
+  height?: number;
   // 背景颜色
   backgroundColor?: string;
   // 背景透明度
