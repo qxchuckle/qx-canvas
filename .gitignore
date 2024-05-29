@@ -4,3 +4,4 @@ node_modules
 extractedCode.txt
 dev
 ./test
+dist
