@@ -35,5 +35,14 @@ const path1 = new QxCanvas.Graphics()
   .moveTo(100, 100)
   .lineTo(200, 200)
   .lineTo(300, 100)
+  .closePath()
+  .beginLine({
+    width: 5,
+    color: "blue",
+  })
+  .beginFill({
+    color: "red",
+  })
+  .bezierCurveTo([400, 100, 500, 200, 600, 100], 1)
   .closePath();
 app.stage.add(path1);

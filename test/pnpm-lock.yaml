@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       qx-canvas:
-        specifier: ^1.0.1
-        version: 1.0.1
+        specifier: ^1.0.3
+        version: 1.0.3
     devDependencies:
       '@rollup/plugin-babel':
         specifier: ^6.0.4
@@ -545,8 +545,8 @@ packages:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
 
-  qx-canvas@1.0.1:
-    resolution: {integrity: sha512-ZSSLQlliXLjcilypqpkc4PmiF37s+8LSKazgmfF+632EfD0gICEi+95E000U2dJL8WKu5/Vv/4KTyzIiR//49A==}
+  qx-canvas@1.0.3:
+    resolution: {integrity: sha512-dl/ITWMTb/s1YU99ndouvb6LNCI6ckBey9nj6bI9B6ZfvW/nw1c6fdwV5bzQUkZwLFemv0V/vtu46ijoku2Jbg==}
 
   readdirp@3.6.0:
     resolution: {integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==}
@@ -1101,7 +1101,7 @@ snapshots:
 
   picomatch@2.3.1: {}
 
-  qx-canvas@1.0.1: {}
+  qx-canvas@1.0.3: {}
 
   readdirp@3.6.0:
     dependencies:
