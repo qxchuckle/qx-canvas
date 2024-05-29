@@ -46,3 +46,32 @@ const path1 = new QxCanvas.Graphics()
   .bezierCurveTo([400, 100, 500, 200, 600, 100], 1)
   .closePath();
 app.stage.add(path1);
+
+const text1 = new QxCanvas.Graphics()
+  .beginFill({ color: "blue" })
+  .drawText("Hello World", 400, 300, {
+    font: "20px Arial",
+    align: "center",
+    baseline: "middle",
+    direction: "ltr",
+  })
+  .setCursor("pointer")
+  .addEventListener("mousedown", (e) => {
+    const mouseDownPoint = e.global.clone();
+    const { x, y } = text1.transform.position;
+    const onMove = (e: any) => {
+      const movePoint = e.global.clone();
+      const dx = movePoint.x - mouseDownPoint.x;
+      const dy = movePoint.y - mouseDownPoint.y;
+      text1.setPosition(x + dx, y + dy);
+    };
+    app.stage.addEventListener("mousemove", onMove);
+    app.stage.addEventListener(
+      "mouseup",
+      () => {
+        app.stage.removeEventListener("mousemove", onMove);
+      },
+      { once: true }
+    );
+  });
+app.stage.add(text1);
