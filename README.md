@@ -215,9 +215,13 @@ declare class Graphics extends Group {
   // 绘制路径
   moveTo(x: number, y: number): this;
   lineTo(x: number, y: number): this;
+  // 绘制任意数量控制点的贝塞尔曲线，指定 t 参数，绘制一定曲线阶段，accuracy 参数指定精度
+  bezierCurveTo(controlPoints: number[], t?: number, accuracy?: number): this;
   closePath(): this;
   // 开始新路径
   beginPath(): this;
+  // 清空路径
+  clearPath(): this;
 }
 ```
 
