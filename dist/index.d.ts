@@ -34,6 +34,8 @@ declare enum LifecycleKey {
 
 interface IAppOptions {
     canvas: HTMLCanvasElement;
+    width?: number;
+    height?: number;
     backgroundColor?: string;
     backgroundAlpha?: number;
 }
@@ -109,12 +111,14 @@ declare abstract class Renderer<T extends IContext["ctx"]> {
     protected canvas: IContext["canvas"];
     private options;
     abstract ctx: T;
+    private originalState;
     constructor(options: Required<IAppOptions>);
     resize(width: number, height: number): void;
     get width(): number;
     get height(): number;
     get backgroundColor(): string;
     get backgroundAlpha(): number;
+    protected abstract dprInit(): void;
     abstract render(stage: Group): void;
 }
 
@@ -123,6 +127,7 @@ declare class CanvasRenderer extends Renderer<CanvasRenderingContext2D> {
     constructor(options: Required<IAppOptions>);
     render(stage: Group): void;
     private renderBackground;
+    protected dprInit: () => void;
 }
 
 declare const defaultStyle$1: {

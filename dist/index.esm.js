@@ -1,19 +1,26 @@
 class Renderer {
     canvas;
     options;
+    originalState = {
+        width: 0,
+        height: 0,
+    };
     constructor(options) {
         this.canvas = options.canvas;
         this.options = options;
+        this.originalState.width = options.width;
+        this.originalState.height = options.height;
     }
     resize(width, height) {
-        this.canvas.width = width;
-        this.canvas.height = height;
+        this.originalState.width = width;
+        this.originalState.height = height;
+        this.dprInit();
     }
     get width() {
-        return this.canvas.width;
+        return this.originalState.width;
     }
     get height() {
-        return this.canvas.height;
+        return this.originalState.height;
     }
     get backgroundColor() {
         return this.options.backgroundColor;
@@ -22,67 +29,6 @@ class Renderer {
         return this.options.backgroundAlpha;
     }
 }
-
-class CanvasRenderer extends Renderer {
-    ctx;
-    constructor(options) {
-        super(options);
-        console.log("使用Canvas2D渲染中");
-        this.ctx = this.canvas.getContext("2d");
-    }
-    render(stage) {
-        stage.updateTransform();
-        this.renderBackground();
-        stage.renderCanvas(this);
-    }
-    renderBackground() {
-        this.ctx.save();
-        this.ctx.clearRect(0, 0, this.width, this.height);
-        this.ctx.globalAlpha = this.backgroundAlpha;
-        this.ctx.fillStyle = this.backgroundColor;
-        this.ctx.fillRect(0, 0, this.width, this.height);
-        this.ctx.restore();
-    }
-}
-
-var ShapeType;
-(function (ShapeType) {
-    ShapeType["Rectangle"] = "rectangle";
-    ShapeType["Polygon"] = "polygon";
-    ShapeType["Circle"] = "circle";
-    ShapeType["Ellipse"] = "ellipse";
-    ShapeType["RoundRect"] = "roundRect";
-    ShapeType["Path"] = "path";
-})(ShapeType || (ShapeType = {}));
-var LINE_CAP;
-(function (LINE_CAP) {
-    LINE_CAP["BUTT"] = "butt";
-    LINE_CAP["ROUND"] = "round";
-    LINE_CAP["SQUARE"] = "square";
-})(LINE_CAP || (LINE_CAP = {}));
-var LINE_JOIN;
-(function (LINE_JOIN) {
-    LINE_JOIN["MITER"] = "miter";
-    LINE_JOIN["BEVEL"] = "bevel";
-    LINE_JOIN["ROUND"] = "round";
-})(LINE_JOIN || (LINE_JOIN = {}));
-var EventPhase;
-(function (EventPhase) {
-    EventPhase["NONE"] = "none";
-    EventPhase["CAPTURING"] = "capturing";
-    EventPhase["AT_TARGET"] = "atTarget";
-    EventPhase["BUBBLING"] = "bubbling";
-})(EventPhase || (EventPhase = {}));
-var LifecycleKey;
-(function (LifecycleKey) {
-    LifecycleKey["BeforeMount"] = "beforeMount";
-    LifecycleKey["Mounted"] = "mounted";
-    LifecycleKey["BeforeRender"] = "beforeRender";
-    LifecycleKey["Rendering"] = "rendering";
-    LifecycleKey["Rendered"] = "rendered";
-    LifecycleKey["BeforeUnmount"] = "beforeUnmount";
-    LifecycleKey["Unmounted"] = "unmounted";
-})(LifecycleKey || (LifecycleKey = {}));
 
 const getArrLast = (arr) => {
     return arr.length > 0 ? arr[arr.length - 1] : null;
@@ -123,6 +69,91 @@ function nextTick(fn) {
         setTimeout(fn, 0);
     }
 }
+function createRefThrottle(fn) {
+    let ticking = false;
+    return () => {
+        if (!ticking) {
+            fn();
+            ticking = true;
+            requestAnimationFrame(() => {
+                ticking = false;
+            });
+        }
+    };
+}
+
+class CanvasRenderer extends Renderer {
+    ctx;
+    constructor(options) {
+        super(options);
+        console.log("QxCanvas 使用 Canvas2D 渲染中");
+        this.ctx = this.canvas.getContext("2d");
+        this.dprInit();
+        window.addEventListener("resize", () => {
+            this.dprInit();
+        });
+    }
+    render(stage) {
+        stage.updateTransform();
+        this.renderBackground();
+        stage.renderCanvas(this);
+    }
+    renderBackground() {
+        this.ctx.save();
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.ctx.globalAlpha = this.backgroundAlpha;
+        this.ctx.fillStyle = this.backgroundColor;
+        this.ctx.fillRect(0, 0, this.width, this.height);
+        this.ctx.restore();
+    }
+    dprInit = createRefThrottle(() => {
+        const dpr = window.devicePixelRatio || 1;
+        this.canvas.style.width = this.width + "px";
+        this.canvas.style.height = this.height + "px";
+        this.canvas.width = this.width * dpr;
+        this.canvas.height = this.height * dpr;
+        this.ctx.scale(dpr, dpr);
+    });
+}
+
+var ShapeType;
+(function (ShapeType) {
+    ShapeType["Rectangle"] = "rectangle";
+    ShapeType["Polygon"] = "polygon";
+    ShapeType["Circle"] = "circle";
+    ShapeType["Ellipse"] = "ellipse";
+    ShapeType["RoundRect"] = "roundRect";
+    ShapeType["Path"] = "path";
+})(ShapeType || (ShapeType = {}));
+var LINE_CAP;
+(function (LINE_CAP) {
+    LINE_CAP["BUTT"] = "butt";
+    LINE_CAP["ROUND"] = "round";
+    LINE_CAP["SQUARE"] = "square";
+})(LINE_CAP || (LINE_CAP = {}));
+var LINE_JOIN;
+(function (LINE_JOIN) {
+    LINE_JOIN["MITER"] = "miter";
+    LINE_JOIN["BEVEL"] = "bevel";
+    LINE_JOIN["ROUND"] = "round";
+})(LINE_JOIN || (LINE_JOIN = {}));
+var EventPhase;
+(function (EventPhase) {
+    EventPhase["NONE"] = "none";
+    EventPhase["CAPTURING"] = "capturing";
+    EventPhase["AT_TARGET"] = "atTarget";
+    EventPhase["BUBBLING"] = "bubbling";
+})(EventPhase || (EventPhase = {}));
+var LifecycleKey;
+(function (LifecycleKey) {
+    LifecycleKey["BeforeMount"] = "beforeMount";
+    LifecycleKey["Mounted"] = "mounted";
+    LifecycleKey["BeforeRender"] = "beforeRender";
+    LifecycleKey["Rendering"] = "rendering";
+    LifecycleKey["Rendered"] = "rendered";
+    LifecycleKey["BeforeUnmount"] = "beforeUnmount";
+    LifecycleKey["Unmounted"] = "unmounted";
+})(LifecycleKey || (LifecycleKey = {}));
 
 class Point {
     x;
@@ -623,7 +654,7 @@ class Group extends Node {
     }
     applyTransform(renderer) {
         const { a, b, c, d, tx, ty } = this.transform.worldMatrix;
-        renderer.ctx.setTransform(a, b, c, d, tx, ty);
+        renderer.ctx.transform(a, b, c, d, tx, ty);
     }
     getSpreadPath() {
         const res = [];
@@ -1385,6 +1416,8 @@ class App {
     constructor(options) {
         this.options = {
             canvas: options.canvas,
+            width: options.width ?? options.canvas.width,
+            height: options.height ?? options.canvas.height,
             backgroundColor: options.backgroundColor ?? "#fff",
             backgroundAlpha: options.backgroundAlpha ?? 1,
         };
