@@ -1,1 +1,119 @@
-{}
+{
+    "src/utils": {
+        "description": "工具函数"
+    },
+    "src/types": {
+        "description": "类型"
+    },
+    "src/test": {
+        "description": "开发测试"
+    },
+    "src/shapes": {
+        "description": "基础图形"
+    },
+    "src/renderer": {
+        "description": "渲染者"
+    },
+    "src/math": {
+        "description": "数学相关"
+    },
+    "src/graphics": {
+        "description": "图案类"
+    },
+    "src/events": {
+        "description": "事件系统"
+    },
+    "src/display": {
+        "description": "布局管理"
+    },
+    "src/app.ts": {
+        "description": "库入口"
+    },
+    "src/index.ts": {
+        "description": "打包入口"
+    },
+    "test": {
+        "description": "发布包测试"
+    },
+    "dev": {
+        "description": "开发阶段构建产物"
+    },
+    "src/display/group.ts": {
+        "description": "组"
+    },
+    "src/display/node.ts": {
+        "description": "节点"
+    },
+    "src/events/eventAdmin.ts": {
+        "description": "事件管理器"
+    },
+    "src/events/eventClient.ts": {
+        "description": "事件中心"
+    },
+    "src/events/eventObject.ts": {
+        "description": "事件对象"
+    },
+    "src/events/eventSystem.ts": {
+        "description": "事件系统"
+    },
+    "src/graphics/style": {
+        "description": "上下文样式"
+    },
+    "src/graphics/style/fill.ts": {
+        "description": "填充样式"
+    },
+    "src/graphics/style/line.ts": {
+        "description": "描边样式"
+    },
+    "src/graphics/graphicsData.ts": {
+        "description": "图形数据"
+    },
+    "src/graphics/graphics.ts": {
+        "description": "图案类"
+    },
+    "src/math/bezier.ts": {
+        "description": "贝塞尔曲线"
+    },
+    "src/math/constant.ts": {
+        "description": "常量"
+    },
+    "src/math/matrix.ts": {
+        "description": "3*3变换矩阵"
+    },
+    "src/math/point.ts": {
+        "description": "点"
+    },
+    "src/math/transform.ts": {
+        "description": "变换矩阵封装"
+    },
+    "src/renderer/canvasRenderer.ts": {
+        "description": "canvas2d渲染"
+    },
+    "src/renderer/renderer.ts": {
+        "description": "渲染类"
+    },
+    "src/shapes/circle.ts": {
+        "description": "圆"
+    },
+    "src/shapes/ellipse.ts": {
+        "description": "椭圆"
+    },
+    "src/shapes/path.ts": {
+        "description": "路径"
+    },
+    "src/shapes/polygon.ts": {
+        "description": "多边形"
+    },
+    "src/shapes/rectangle.ts": {
+        "description": "矩形"
+    },
+    "src/shapes/roundRect.ts": {
+        "description": "圆角矩形"
+    },
+    "src/shapes/shape.ts": {
+        "description": "图形类"
+    },
+    "src/shapes/text.ts": {
+        "description": "文本"
+    }
+}
