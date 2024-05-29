@@ -130,6 +130,7 @@
         ShapeType["Ellipse"] = "ellipse";
         ShapeType["RoundRect"] = "roundRect";
         ShapeType["Path"] = "path";
+        ShapeType["Text"] = "text";
     })(ShapeType || (ShapeType = {}));
     var LINE_CAP;
     (function (LINE_CAP) {
@@ -1460,6 +1461,64 @@
         }
     }
 
+    class Text extends Shape {
+        type = ShapeType.Text;
+        text;
+        x;
+        y;
+        textStyle;
+        _x = NaN;
+        _y = NaN;
+        _width = NaN;
+        _height = NaN;
+        constructor(text, x, y, textStyle) {
+            super();
+            this.text = text;
+            this.x = x;
+            this.y = y;
+            this.textStyle = textStyle ?? {};
+        }
+        contains(p) {
+            if (p.x > this._x &&
+                p.x < this._x + this._width &&
+                p.y > this._y &&
+                p.y < this._y + this._height) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        render(renderer, data, worldAlpha, setCtxStyle) {
+            const ctx = renderer.ctx;
+            const fillStyle = data.fillStyle;
+            const lineStyle = data.lineStyle;
+            const { font, align, baseline, direction, maxWidth } = this.textStyle;
+            font && (ctx.font = font);
+            align && (ctx.textAlign = align);
+            baseline && (ctx.textBaseline = baseline);
+            direction && (ctx.direction = direction);
+            if (Number.isNaN(this._height)) {
+                const metrics = ctx.measureText(this.text);
+                this._x = this.x - metrics.actualBoundingBoxLeft;
+                this._y = this.y - metrics.actualBoundingBoxAscent;
+                this._height =
+                    metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+                this._width =
+                    metrics.actualBoundingBoxRight + metrics.actualBoundingBoxLeft;
+                console.log(metrics.actualBoundingBoxLeft);
+            }
+            if (fillStyle.visible) {
+                setCtxStyle(ctx, data, true);
+                ctx.fillText(this.text, this.x, this.y, maxWidth);
+            }
+            if (lineStyle.visible) {
+                setCtxStyle(ctx, data, false);
+                ctx.strokeText(this.text, this.x, this.y, maxWidth);
+            }
+        }
+    }
+
     class App {
         renderer;
         options;
@@ -1602,6 +1661,10 @@
         }
         drawPolygon(points) {
             this.drawShape(new Polygon(points, true));
+            return this;
+        }
+        drawText(text, x, y, textStyle) {
+            this.drawShape(new Text(text, x, y, textStyle));
             return this;
         }
         moveTo(x, y) {

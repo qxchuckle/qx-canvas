@@ -4,7 +4,8 @@ declare enum ShapeType {
     Circle = "circle",
     Ellipse = "ellipse",
     RoundRect = "roundRect",
-    Path = "path"
+    Path = "path",
+    Text = "text"
 }
 declare enum LINE_CAP {
     BUTT = "butt",
@@ -200,6 +201,7 @@ declare class Graphics extends Group {
     drawEllipse(x: number, y: number, radiusX: number, radiusY: number): this;
     drawRoundRect(x: number, y: number, width: number, height: number, radius: number): this;
     drawPolygon(points: number[]): this;
+    drawText(text: string, x: number, y: number, textStyle?: TextStyle): this;
     moveTo(x: number, y: number): this;
     lineTo(x: number, y: number): this;
     bezierCurveTo(controlPoints: number[], t?: number, accuracy?: number): this;
@@ -375,6 +377,14 @@ type EventMap = {
 type EventType = keyof EventMap;
 type EventListener = (e: EventObject) => any;
 type EventOptions = Pick<AddEventListenerOptions, "capture" | "once">;
+
+type TextStyle = {
+    font?: string;
+    align?: CanvasTextAlign;
+    baseline?: CanvasTextBaseline;
+    direction?: CanvasDirection;
+    maxWidth?: number;
+};
 
 declare class App<T extends IContext["ctx"] = CanvasRenderingContext2D> {
     private renderer;
