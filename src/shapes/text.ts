@@ -61,7 +61,6 @@ export class Text extends Shape {
         metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
       this._width =
         metrics.actualBoundingBoxRight + metrics.actualBoundingBoxLeft;
-      console.log(metrics.actualBoundingBoxLeft);
     }
     if (fillStyle.visible) {
       setCtxStyle(ctx, data, true);
