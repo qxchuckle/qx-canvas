@@ -6,6 +6,7 @@ export enum ShapeType {
   Ellipse = "ellipse",
   RoundRect = "roundRect",
   Path = "path",
+  Text = "text",
 }
 
 // 线条端点样式，对应 lineCap 属性

@@ -240,3 +240,32 @@ app.stage.add(s1).addEventListener("mousedown", (e) => {
     { once: true }
   );
 });
+
+const text = new QxCanvas.Graphics()
+  .beginFill({ color: "blue" })
+  .drawText("Hello World", 400, 100, {
+    font: "20px Arial",
+    align: "center",
+    baseline: "middle",
+    direction: "ltr",
+  })
+  .setCursor("pointer")
+  .addEventListener("mousedown", (e) => {
+    const mouseDownPoint = e.global.clone();
+    const { x, y } = text.transform.position;
+    const onMove = (e: any) => {
+      const movePoint = e.global.clone();
+      const dx = movePoint.x - mouseDownPoint.x;
+      const dy = movePoint.y - mouseDownPoint.y;
+      text.setPosition(x + dx, y + dy);
+    };
+    app.stage.addEventListener("mousemove", onMove);
+    app.stage.addEventListener(
+      "mouseup",
+      () => {
+        app.stage.removeEventListener("mousemove", onMove);
+      },
+      { once: true }
+    );
+  });
+app.stage.add(text);

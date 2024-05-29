@@ -6,12 +6,14 @@ import {
   RoundRect,
   Polygon,
   Path,
+  Text,
 } from "../shapes";
 import { Group } from "../display/group";
 import { CanvasRenderer } from "../renderer";
 import { GraphicsData } from "./graphicsData";
 import { FillStyle, LineStyle, FillStyleType, LineStyleType } from "./style";
 import { Point, bezier } from "../math";
+import { TextStyle } from "../types";
 
 // Graphics 类包含一组用于创建各种形状的方法。
 export class Graphics extends Group {
@@ -156,6 +158,12 @@ export class Graphics extends Group {
   // 绘制多边形
   public drawPolygon(points: number[]) {
     this.drawShape(new Polygon(points, true));
+    return this;
+  }
+
+  // 绘制文本
+  public drawText(text: string, x: number, y: number, textStyle?: TextStyle) {
+    this.drawShape(new Text(text, x, y, textStyle));
     return this;
   }
 
