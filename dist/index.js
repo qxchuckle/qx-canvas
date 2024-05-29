@@ -353,6 +353,39 @@
         }
     }
 
+    function bezier(controlPoints, t, accuracy) {
+        if (t <= 0) {
+            return [];
+        }
+        t = Math.min(t, 1);
+        accuracy = Math.floor(accuracy * t);
+        accuracy = Math.max(accuracy, 20);
+        accuracy = Math.min(accuracy, 2048);
+        const result = [];
+        const addNum = 1 / accuracy;
+        let i = 0;
+        while (i <= t) {
+            calcBezierPoint(controlPoints, result, i);
+            i += addNum;
+        }
+        calcBezierPoint(controlPoints, result, t);
+        return result;
+    }
+    function calcBezierPoint(points, curvePoints, t) {
+        if (points.length <= 2) {
+            curvePoints.push(...points);
+            return;
+        }
+        const newPoints = [];
+        for (let i = 0; i < points.length - 2; i += 2) {
+            newPoints.push(...calcMotionPoint(points[i], points[i + 1], points[i + 2], points[i + 3], t));
+        }
+        calcBezierPoint(newPoints, curvePoints, t);
+    }
+    function calcMotionPoint(p0x, p0y, p1x, p1y, t) {
+        return [(1 - t) * p0x + t * p1x, (1 - t) * p0y + t * p1y];
+    }
+
     class EventClient {
         _events = new Map();
         on(event, listener) {
@@ -1326,6 +1359,7 @@
         }
         pushClosePath() {
             this.pushState(undefined, true);
+            this.points.push(NaN, NaN);
         }
         updateStyle(ctx, index, worldAlpha) {
             const style = this.state[index];
@@ -1411,6 +1445,18 @@
         }
         pushPoint(x, y) {
             this.points.push(x, y);
+        }
+        reset() {
+            this.points.length = 0;
+            this.lastStateIndex = -1;
+            this.closePath = false;
+            this.state = {};
+            this.path2D = {
+                fillPath: new Path2D(),
+                linePath: new Path2D(),
+            };
+            this.fillStyle.reset();
+            this.lineStyle.reset();
         }
     }
 
@@ -1578,6 +1624,10 @@
             this.currentPath.pushPoint(x, y);
             return this;
         }
+        bezierCurveTo(controlPoints, t = 1, accuracy = 100) {
+            this.currentPath.points.push(...bezier(controlPoints, t, accuracy));
+            return this;
+        }
         closePath() {
             this.currentPath.pushClosePath();
             return this;
@@ -1593,6 +1643,10 @@
         }
         endLine() {
             this.beginLine({ visible: false });
+            return this;
+        }
+        clearPath() {
+            this.currentPath.reset();
             return this;
         }
     }

@@ -202,10 +202,12 @@ declare class Graphics extends Group {
     drawPolygon(points: number[]): this;
     moveTo(x: number, y: number): this;
     lineTo(x: number, y: number): this;
+    bezierCurveTo(controlPoints: number[], t?: number, accuracy?: number): this;
     closePath(): this;
     beginPath(): this;
     endFill(): this;
     endLine(): this;
+    clearPath(): this;
 }
 
 type SetCtxStyle = (ctx: CanvasRenderingContext2D, data: GraphicsData, isFill: boolean) => void;
