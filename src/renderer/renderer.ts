@@ -5,23 +5,32 @@ export abstract class Renderer<T extends IContext["ctx"]> {
   protected canvas: IContext["canvas"];
   private options: Required<IAppOptions>;
   abstract ctx: T;
+  private originalState = {
+    width: 0,
+    height: 0,
+  };
 
   constructor(options: Required<IAppOptions>) {
     this.canvas = options.canvas;
     this.options = options;
+    this.originalState.width = options.width;
+    this.originalState.height = options.height;
   }
 
   resize(width: number, height: number): void {
-    this.canvas.width = width;
-    this.canvas.height = height;
+    // this.canvas.width = width;
+    // this.canvas.height = height;
+    this.originalState.width = width;
+    this.originalState.height = height;
+    this.dprInit();
   }
 
   get width(): number {
-    return this.canvas.width;
+    return this.originalState.width;
   }
 
   get height(): number {
-    return this.canvas.height;
+    return this.originalState.height;
   }
 
   get backgroundColor() {
@@ -32,5 +41,8 @@ export abstract class Renderer<T extends IContext["ctx"]> {
     return this.options.backgroundAlpha;
   }
 
-  abstract render(stage: Group): void;
+  // dpr优化
+  protected abstract dprInit(): void;
+
+  public abstract render(stage: Group): void;
 }

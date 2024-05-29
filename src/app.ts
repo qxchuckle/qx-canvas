@@ -16,6 +16,8 @@ export class App<T extends IContext["ctx"] = CanvasRenderingContext2D> {
   constructor(options: IAppOptions) {
     this.options = {
       canvas: options.canvas,
+      width: options.width ?? options.canvas.width,
+      height: options.height ?? options.canvas.height,
       backgroundColor: options.backgroundColor ?? "#fff",
       backgroundAlpha: options.backgroundAlpha ?? 1,
     };

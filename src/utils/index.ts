@@ -54,3 +54,16 @@ export function nextTick(fn: (...argv: any[]) => void) {
     setTimeout(fn, 0);
   }
 }
+// 节流
+export function createRefThrottle(fn: (...argv: any[]) => void) {
+  let ticking = false;
+  return () => {
+    if (!ticking) {
+      fn();
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+      });
+    }
+  };
+}

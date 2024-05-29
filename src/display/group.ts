@@ -170,7 +170,7 @@ export class Group extends Node {
   // 应用变换
   protected applyTransform(renderer: CanvasRenderer) {
     const { a, b, c, d, tx, ty } = this.transform.worldMatrix;
-    renderer.ctx.setTransform(a, b, c, d, tx, ty);
+    renderer.ctx.transform(a, b, c, d, tx, ty);
   }
 
   // 获取传播路径

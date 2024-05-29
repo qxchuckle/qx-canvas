@@ -1,3 +1,4 @@
+import { createRefThrottle } from "src/utils";
 import { Group } from "../display/group";
 import { IAppOptions } from "../types";
 import { Renderer } from "./renderer";
@@ -7,11 +8,15 @@ export class CanvasRenderer extends Renderer<CanvasRenderingContext2D> {
 
   constructor(options: Required<IAppOptions>) {
     super(options);
-    console.log("使用Canvas2D渲染中");
+    console.log("QxCanvas 使用 Canvas2D 渲染中");
     this.ctx = this.canvas.getContext("2d")!;
+    this.dprInit();
+    window.addEventListener("resize", () => {
+      this.dprInit();
+    });
   }
 
-  render(stage: Group): void {
+  public render(stage: Group): void {
     stage.updateTransform();
     this.renderBackground();
     // 渲染根节点
@@ -27,4 +32,14 @@ export class CanvasRenderer extends Renderer<CanvasRenderingContext2D> {
     this.ctx.fillRect(0, 0, this.width, this.height);
     this.ctx.restore();
   }
+
+  protected dprInit = createRefThrottle(() =>{
+    const dpr = window.devicePixelRatio || 1;
+    this.canvas.style.width = this.width + "px";
+    this.canvas.style.height = this.height + "px";
+    this.canvas.width = this.width * dpr;
+    this.canvas.height = this.height * dpr;
+    // 使画布内容也跟着缩放
+    this.ctx.scale(dpr, dpr);
+  })
 }
