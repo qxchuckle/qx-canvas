@@ -211,6 +211,8 @@ declare class Graphics extends Group {
   drawRoundRect(x: number, y: number, width: number, height: number, radius: number): this;
   // 多边形
   drawPolygon(points: number[]): this;
+  // 文本
+  drawText(text: string, x: number, y: number, textStyle?: TextStyle): this;
 
   // 绘制路径
   moveTo(x: number, y: number): this;
@@ -262,6 +264,20 @@ s.onBeforeMount((item) => {
 5. `onRendered`：每帧渲染后触发，此时节点及其子节点都已经渲染完毕。
 6. `onBeforeUnmount`：从父节点移除前触发。
 7. `onUnmounted`：从父节点移除后触发。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
