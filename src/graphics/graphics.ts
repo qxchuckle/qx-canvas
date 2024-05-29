@@ -11,7 +11,7 @@ import { Group } from "../display/group";
 import { CanvasRenderer } from "../renderer";
 import { GraphicsData } from "./graphicsData";
 import { FillStyle, LineStyle, FillStyleType, LineStyleType } from "./style";
-import { Point } from "../math";
+import { Point, bezier } from "../math";
 
 // Graphics 类包含一组用于创建各种形状的方法。
 export class Graphics extends Group {
@@ -186,6 +186,12 @@ export class Graphics extends Group {
     return this;
   }
 
+  // 贝塞尔曲线
+  bezierCurveTo(controlPoints: number[], t: number = 1, accuracy = 100) {
+    this.currentPath.points.push(...bezier(controlPoints, t, accuracy));
+    return this;
+  }
+
   // 闭合路径
   closePath() {
     this.currentPath.pushClosePath();
@@ -208,6 +214,12 @@ export class Graphics extends Group {
   // 结束描边
   endLine() {
     this.beginLine({ visible: false });
+    return this;
+  }
+
+  // 清除路径绘制
+  clearPath() {
+    this.currentPath.reset();
     return this;
   }
 }

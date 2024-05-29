@@ -10,7 +10,7 @@ export class Path extends Shape {
   public readonly type = ShapeType.Path;
   public readonly points: number[];
   // 记录样式状态，points 的索引作为 key，样式作为 value
-  private readonly state: {
+  private state: {
     [key: number]: {
       fillStyle?: FillStyle;
       lineStyle?: LineStyle;
@@ -100,6 +100,8 @@ export class Path extends Shape {
     //   this.state[this.lastStateIndex].closePath = true;
     // }
     this.pushState(undefined, true);
+    // 闭合路径后，添加两个 NaN，使下一个路径从新的起点开始
+    this.points.push(NaN, NaN);
   }
 
   // 更新当前样式
@@ -210,5 +212,18 @@ export class Path extends Shape {
 
   pushPoint(x: number, y: number) {
     this.points.push(x, y);
+  }
+
+  reset() {
+    this.points.length = 0;
+    this.lastStateIndex = -1;
+    this.closePath = false;
+    this.state = {};
+    this.path2D = {
+      fillPath: new Path2D(),
+      linePath: new Path2D(),
+    };
+    this.fillStyle.reset();
+    this.lineStyle.reset();
   }
 }

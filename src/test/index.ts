@@ -188,7 +188,14 @@ const s = new QxCanvas.Graphics()
   .moveTo(200, 50)
   .lineTo(150, 100)
   .lineTo(300, 100)
-  .closePath();
+  .closePath()
+  .endFill()
+  .beginLine({
+    width: 2,
+    color: "blue",
+  })
+  .moveTo(400, 400)
+  .bezierCurveTo([400, 400, 500, 500, 600, 400], 1);
 
 app.stage.add(s);
 
