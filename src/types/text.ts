@@ -4,4 +4,6 @@ export type TextStyle = {
   baseline?: CanvasTextBaseline;
   direction?: CanvasDirection;
   maxWidth?: number;
+  autoBreak?: boolean;
+  lineHeight?: number;
 };

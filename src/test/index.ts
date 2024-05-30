@@ -243,11 +243,13 @@ app.stage.add(s1).addEventListener("mousedown", (e) => {
 
 const text = new QxCanvas.Graphics()
   .beginFill({ color: "blue" })
-  .drawText("Hello World", 400, 100, {
+  .drawText("Hello World", 600, 100, {
     font: "20px Arial",
     align: "center",
-    baseline: "middle",
+    baseline: "bottom",
     direction: "ltr",
+    autoBreak: true,
+    maxWidth: 60,
   })
   .setCursor("pointer")
   .addEventListener("mousedown", (e) => {
