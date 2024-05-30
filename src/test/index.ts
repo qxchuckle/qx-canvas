@@ -251,6 +251,12 @@ const text = new QxCanvas.Graphics()
     autoBreak: true,
     maxWidth: 60,
   })
+  .endFill()
+  .beginLine()
+  .moveTo(600, 50)
+  .lineTo(600, 150)
+  .moveTo(550, 100)
+  .lineTo(650, 100)
   .setCursor("pointer")
   .addEventListener("mousedown", (e) => {
     const mouseDownPoint = e.global.clone();
