@@ -224,6 +224,14 @@ declare class Graphics extends Group {
   beginPath(): this;
   // 清空路径
   clearPath(): this;
+  // 开始剪切
+  beginClip(): this;
+  // 结束剪切
+  endClip(): this;
+
+  // 设置遮罩，将另一个图案对象作为遮罩
+  // x、y、width、height，设置遮罩作用区域
+  setMask(x: number, y: number, width: number, height: number, graphics: Graphics): this;
 }
 ```
 
