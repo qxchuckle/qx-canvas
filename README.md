@@ -230,8 +230,8 @@ declare class Graphics extends Group {
   endClip(): this;
 
   // 设置遮罩，将另一个图案对象作为遮罩
-  // x、y、width、height，设置遮罩作用区域
-  setMask(x: number, y: number, width: number, height: number, graphics: Graphics): this;
+  // x、y、width、height，设置遮罩作用区域。type，设置遮罩的合成方式
+  setMask(x: number, y: number, width: number, height: number, graphics: Graphics, type?: GlobalCompositeOperation): this;
 }
 ```
 
