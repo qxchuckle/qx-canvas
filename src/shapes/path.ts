@@ -15,6 +15,7 @@ export class Path extends Shape {
       fillStyle?: FillStyle;
       lineStyle?: LineStyle;
       closePath?: boolean;
+      clip?: boolean;
     };
   } = {};
   private lastStateIndex = -1;
@@ -22,9 +23,11 @@ export class Path extends Shape {
   private readonly fillStyle: FillStyle = new FillStyle();
   private readonly lineStyle: LineStyle = new LineStyle();
   private closePath: boolean = false;
+  private _clip: boolean = false;
   private path2D = {
     fillPath: new Path2D(),
     linePath: new Path2D(),
+    clipPath: new Path2D(),
   };
 
   constructor(points: number[] = []) {
@@ -74,13 +77,18 @@ export class Path extends Shape {
   }
 
   // 添加状态
-  pushState(style?: FillStyle | LineStyle, closePath: boolean = false) {
+  pushState(
+    style?: FillStyle | LineStyle,
+    closePath: boolean = false,
+    clip: boolean = false
+  ) {
     const index = Math.max(this.points.length - 1, 0);
     if (!this.state[index]) {
       this.state[index] = {
         lineStyle: undefined,
         fillStyle: undefined,
         closePath: false,
+        clip: false,
       };
     }
     if (style) {
@@ -91,6 +99,7 @@ export class Path extends Shape {
       }
     }
     this.state[index].closePath = closePath;
+    this.state[index].clip = clip;
     this.lastStateIndex = index;
     // console.log(this.state);
   }
@@ -104,6 +113,10 @@ export class Path extends Shape {
     this.points.push(NaN, NaN);
   }
 
+  pushClip() {
+    this.pushState(undefined, false, true);
+  }
+
   // 更新当前样式
   private updateStyle(
     ctx: CanvasRenderingContext2D,
@@ -113,6 +126,10 @@ export class Path extends Shape {
     const style = this.state[index];
     if (!style) {
       return;
+    }
+    if (style.clip) {
+      this.clip(ctx);
+      this._clip = style.clip;
     }
     if (style.lineStyle) {
       // 在更新样式前，先用现在都样式画出目前的路径
@@ -162,16 +179,28 @@ export class Path extends Shape {
     this.path2D.fillPath = new Path2D();
   }
 
+  private clip(ctx: CanvasRenderingContext2D) {
+    if (this._clip) {
+      if (this.closePath) {
+        this.path2D.clipPath.closePath();
+      }
+      ctx.clip(this.path2D.clipPath);
+    }
+    this.path2D.clipPath = new Path2D();
+  }
+
   // 当前路径的画笔移动到指定点
   private moveTo(x: number, y: number) {
     this.fillStyle.visible && this.path2D.fillPath.moveTo(x, y);
     this.lineStyle.visible && this.path2D.linePath.moveTo(x, y);
+    this.path2D.clipPath.moveTo(x, y);
   }
 
   // 当前路径的画笔连线到指定点
   private lineTo(x: number, y: number) {
     this.fillStyle.visible && this.path2D.fillPath.lineTo(x, y);
     this.lineStyle.visible && this.path2D.linePath.lineTo(x, y);
+    this.path2D.clipPath.lineTo(x, y);
   }
 
   render(
@@ -203,11 +232,13 @@ export class Path extends Shape {
     }
     // 应用最后一次状态
     if (this.lastStateIndex >= 0) {
+      this.clip(ctx);
       this.stroke(ctx, worldAlpha);
       this.fill(ctx, worldAlpha);
     }
     this.lineStyle.reset();
     this.fillStyle.reset();
+    this._clip = false;
   }
 
   pushPoint(x: number, y: number) {
@@ -222,6 +253,7 @@ export class Path extends Shape {
     this.path2D = {
       fillPath: new Path2D(),
       linePath: new Path2D(),
+      clipPath: new Path2D(),
     };
     this.fillStyle.reset();
     this.lineStyle.reset();

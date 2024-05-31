@@ -70,10 +70,10 @@ export class Graphics extends Group {
     // 遍历图形数据列表，渲染图形
     for (let i = 0; i < this.graphicsDataList.length; i++) {
       const data = this.graphicsDataList[i];
-      ctx.save();
+      // ctx.save();
       ctx.beginPath();
       data.shape.render(renderer, data, this.worldAlpha, this.setCtxStyle);
-      ctx.restore();
+      // ctx.restore();
     }
     ctx.restore();
     return this;
@@ -92,6 +92,11 @@ export class Graphics extends Group {
     this.lineStyle.set(style);
     this.lineStyle.visible = style.visible ?? true;
     this.currentPath.pushState(this.lineStyle.clone());
+    return this;
+  }
+
+  public beginClip() {
+    this.currentPath.pushClip();
     return this;
   }
 

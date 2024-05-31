@@ -277,3 +277,15 @@ const text = new QxCanvas.Graphics()
     );
   });
 app.stage.add(text);
+
+// 剪裁测试
+const cp = new QxCanvas.Graphics()
+  .beginClip()
+  .moveTo(600, 500)
+  .lineTo(700, 500)
+  .lineTo(650, 600)
+  .closePath()
+  .beginFill()
+  .drawRect(600, 500, 100, 100);
+
+app.stage.add(cp);

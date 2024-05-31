@@ -3,5 +3,5 @@ node_modules
 .rollup.cache
 extractedCode.txt
 dev
-test
 dist
+test-package
