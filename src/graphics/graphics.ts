@@ -7,6 +7,8 @@ import {
   Polygon,
   Path,
   Text,
+  CImage,
+  imageClip,
 } from "../shapes";
 import { Group } from "../display/group";
 import { CanvasRenderer } from "../renderer";
@@ -169,6 +171,19 @@ export class Graphics extends Group {
   // 绘制文本
   public drawText(text: string, x: number, y: number, textStyle?: TextStyle) {
     this.drawShape(new Text(text, x, y, textStyle));
+    return this;
+  }
+
+  // 绘制图像
+  public drawImage(
+    image: CanvasImageSource | string,
+    x: number,
+    y: number,
+    width?: number,
+    height?: number,
+    clip?: imageClip
+  ) {
+    this.drawShape(new CImage(image, x, y, width, height, clip));
     return this;
   }
 

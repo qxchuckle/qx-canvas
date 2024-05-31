@@ -115,5 +115,8 @@
     },
     "src/shapes/text.ts": {
         "description": "文本"
+    },
+    "src/shapes/image.ts": {
+        "description": "图像"
     }
 }

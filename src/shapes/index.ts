@@ -6,3 +6,4 @@ export * from "./roundRect";
 export * from "./polygon";
 export * from "./path";
 export * from "./text";
+export * from "./image";

@@ -289,3 +289,20 @@ const cp = new QxCanvas.Graphics()
   .drawRect(600, 500, 100, 100);
 
 app.stage.add(cp);
+
+const img = new QxCanvas.Graphics()
+  .beginFill({
+    shadowOffsetX: 5,
+    shadowOffsetY: 5,
+    shadowBlur: 5,
+    shadowColor: "rgba(0,0,0,0.5)",
+  })
+  .drawImage(
+    "https://cdn.qcqx.cn/img/head.webp",
+    600,
+    200,
+    100 // 只传入宽度，高度自适应
+  )
+  .setCursor("pointer");
+
+app.stage.add(img);
