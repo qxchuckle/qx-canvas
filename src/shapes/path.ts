@@ -113,8 +113,8 @@ export class Path extends Shape {
     this.points.push(NaN, NaN);
   }
 
-  pushClip() {
-    this.pushState(undefined, false, true);
+  pushClip(value: boolean = true) {
+    this.pushState(undefined, false, value);
   }
 
   // 更新当前样式

@@ -28,6 +28,14 @@ export class Graphics extends Group {
   private readonly lineStyle: LineStyle = new LineStyle();
   // 除了能绘制各种图形外，本身也可以自由绘制
   private currentPath = new Path();
+  // 遮罩
+  private _mask = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+    graphics: undefined as Graphics | undefined,
+  };
 
   constructor() {
     super();
@@ -69,15 +77,44 @@ export class Graphics extends Group {
     ctx.save();
     // 应用变换
     this.applyTransform(renderer);
+    ctx.save();
     // 遍历图形数据列表，渲染图形
     for (let i = 0; i < this.graphicsDataList.length; i++) {
       const data = this.graphicsDataList[i];
-      // ctx.save();
       ctx.beginPath();
       data.shape.render(renderer, data, this.worldAlpha, this.setCtxStyle);
-      // ctx.restore();
     }
     ctx.restore();
+    this.renderMask(renderer);
+    ctx.restore();
+    return this;
+  }
+
+  // 渲染遮罩
+  protected renderMask(renderer: CanvasRenderer) {
+    if (this._mask?.graphics) {
+      const ctx = renderer.ctx;
+      // 剪切出遮罩区域
+      ctx.moveTo(this._mask.x, this._mask.y);
+      ctx.lineTo(this._mask.x + this._mask.width, this._mask.y);
+      ctx.lineTo(
+        this._mask.x + this._mask.width,
+        this._mask.y + this._mask.height
+      );
+      ctx.lineTo(this._mask.x, this._mask.y + this._mask.height);
+      ctx.closePath();
+      ctx.clip();
+      const mask = this._mask.graphics;
+      // 利用合成实现遮罩
+      ctx.globalCompositeOperation = "destination-in";
+      // 更新Transform
+      // mask.sort();
+      // for (let i = 0; i < mask.children.length; i++) {
+      //   mask.children[i].updateTransform();
+      // }
+      // 渲染遮罩
+      mask.renderCanvas(renderer);
+    }
     return this;
   }
 
@@ -99,6 +136,23 @@ export class Graphics extends Group {
 
   public beginClip() {
     this.currentPath.pushClip();
+    return this;
+  }
+
+  // 结束填充
+  public endFill() {
+    this.beginFill({ visible: false });
+    return this;
+  }
+
+  // 结束描边
+  public endLine() {
+    this.beginLine({ visible: false });
+    return this;
+  }
+
+  public endClip() {
+    this.currentPath.pushClip(false);
     return this;
   }
 
@@ -233,21 +287,27 @@ export class Graphics extends Group {
     return this;
   }
 
-  // 结束填充
-  endFill() {
-    this.beginFill({ visible: false });
-    return this;
-  }
-
-  // 结束描边
-  endLine() {
-    this.beginLine({ visible: false });
-    return this;
-  }
-
   // 清除路径绘制
   clearPath() {
     this.currentPath.reset();
+    return this;
+  }
+
+  // 设置遮罩
+  public setMask(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    graphics: Graphics
+  ) {
+    this._mask = {
+      x,
+      y,
+      width,
+      height,
+      graphics,
+    };
     return this;
   }
 }

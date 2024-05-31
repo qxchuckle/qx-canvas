@@ -290,19 +290,31 @@ const cp = new QxCanvas.Graphics()
 
 app.stage.add(cp);
 
+const textMask = new QxCanvas.Graphics()
+  .beginFill()
+  .drawText("qcqx", 600, 250, { font: "48px border Arial" });
 const img = new QxCanvas.Graphics()
+  // .beginClip()
+  // .moveTo(600, 200)
+  // .lineTo(700, 200)
+  // .lineTo(650, 300)
+  // .closePath()
   .beginFill({
     shadowOffsetX: 5,
     shadowOffsetY: 5,
     shadowBlur: 5,
     shadowColor: "rgba(0,0,0,0.5)",
   })
+  // .beginFill()
   .drawImage(
     "https://cdn.qcqx.cn/img/head.webp",
     600,
     200,
     100 // 只传入宽度，高度自适应
   )
-  .setCursor("pointer");
+  .setCursor("pointer")
+  .setMask(600, 200, 100, 100, textMask)
+  .setPivot(600, 200)
+  .setRotation(45);
 
 app.stage.add(img);
