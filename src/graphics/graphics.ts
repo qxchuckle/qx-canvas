@@ -35,6 +35,7 @@ export class Graphics extends Group {
     width: 0,
     height: 0,
     graphics: undefined as Graphics | undefined,
+    type: "destination-in" as GlobalCompositeOperation,
   };
 
   constructor() {
@@ -106,7 +107,7 @@ export class Graphics extends Group {
       ctx.clip();
       const mask = this._mask.graphics;
       // 利用合成实现遮罩
-      ctx.globalCompositeOperation = "destination-in";
+      ctx.globalCompositeOperation = this._mask.type;
       // 更新Transform
       // mask.sort();
       // for (let i = 0; i < mask.children.length; i++) {
@@ -299,7 +300,8 @@ export class Graphics extends Group {
     y: number,
     width: number,
     height: number,
-    graphics: Graphics
+    graphics: Graphics,
+    type: GlobalCompositeOperation = "destination-in"
   ) {
     this._mask = {
       x,
@@ -307,6 +309,7 @@ export class Graphics extends Group {
       width,
       height,
       graphics,
+      type,
     };
     return this;
   }

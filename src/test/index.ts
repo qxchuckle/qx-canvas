@@ -313,7 +313,7 @@ const img = new QxCanvas.Graphics()
     100 // 只传入宽度，高度自适应
   )
   .setCursor("pointer")
-  .setMask(600, 200, 100, 100, textMask)
+  .setMask(600, 200, 100, 100, textMask, "destination-in")
   .setPivot(600, 200)
   .setRotation(45);
 
