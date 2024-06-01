@@ -78,7 +78,6 @@ export class Graphics extends Group {
     ctx.save();
     // 应用变换
     this.applyTransform(renderer);
-    ctx.save();
     // 遍历图形数据列表，渲染图形
     for (let i = 0; i < this.graphicsDataList.length; i++) {
       const data = this.graphicsDataList[i];
@@ -86,6 +85,7 @@ export class Graphics extends Group {
       data.shape.render(renderer, data, this.worldAlpha, this.setCtxStyle);
     }
     ctx.restore();
+    ctx.save();
     this.renderMask(renderer);
     ctx.restore();
     return this;
@@ -95,17 +95,22 @@ export class Graphics extends Group {
   protected renderMask(renderer: CanvasRenderer) {
     if (this._mask?.graphics) {
       const ctx = renderer.ctx;
+      const mask = this._mask.graphics;
       // 剪切出遮罩区域
-      ctx.moveTo(this._mask.x, this._mask.y);
-      ctx.lineTo(this._mask.x + this._mask.width, this._mask.y);
-      ctx.lineTo(
+      mask.beginClip();
+      mask.moveTo(this._mask.x, this._mask.y);
+      mask.lineTo(this._mask.x + this._mask.width, this._mask.y);
+      mask.lineTo(
         this._mask.x + this._mask.width,
         this._mask.y + this._mask.height
       );
-      ctx.lineTo(this._mask.x, this._mask.y + this._mask.height);
-      ctx.closePath();
-      ctx.clip();
-      const mask = this._mask.graphics;
+      mask.lineTo(this._mask.x, this._mask.y + this._mask.height);
+      mask.closePath();
+      mask.endClip();
+      // 设置遮罩的父节点为当前节点
+      mask.parent = this;
+      // 更新遮罩的 Transform
+      mask.updateTransform();
       // 利用合成实现遮罩
       ctx.globalCompositeOperation = this._mask.type;
       // 更新Transform
