@@ -292,7 +292,8 @@ app.stage.add(cp);
 
 const textMask = new QxCanvas.Graphics()
   .beginFill()
-  .drawText("qcqx", 600, 250, { font: "48px border Arial" });
+  .drawText("qcqx", 600, 250, { font: "48px border Arial" })
+  .setPosition(10, 10);
 const img = new QxCanvas.Graphics()
   // .beginClip()
   // .moveTo(600, 200)

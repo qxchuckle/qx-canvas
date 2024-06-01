@@ -84,8 +84,6 @@ export class Graphics extends Group {
       ctx.beginPath();
       data.shape.render(renderer, data, this.worldAlpha, this.setCtxStyle);
     }
-    ctx.restore();
-    ctx.save();
     this.renderMask(renderer);
     ctx.restore();
     return this;
@@ -97,16 +95,17 @@ export class Graphics extends Group {
       const ctx = renderer.ctx;
       const mask = this._mask.graphics;
       // 剪切出遮罩区域
-      mask.beginClip();
-      mask.moveTo(this._mask.x, this._mask.y);
-      mask.lineTo(this._mask.x + this._mask.width, this._mask.y);
-      mask.lineTo(
+      ctx.moveTo(this._mask.x, this._mask.y);
+      ctx.lineTo(this._mask.x + this._mask.width, this._mask.y);
+      ctx.lineTo(
         this._mask.x + this._mask.width,
         this._mask.y + this._mask.height
       );
-      mask.lineTo(this._mask.x, this._mask.y + this._mask.height);
-      mask.closePath();
-      mask.endClip();
+      ctx.lineTo(this._mask.x, this._mask.y + this._mask.height);
+      ctx.closePath();
+      ctx.restore();
+      ctx.save();
+      ctx.clip();
       // 设置遮罩的父节点为当前节点
       mask.parent = this;
       // 更新遮罩的 Transform
