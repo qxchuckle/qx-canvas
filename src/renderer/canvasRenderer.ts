@@ -35,11 +35,13 @@ export class CanvasRenderer extends Renderer<CanvasRenderingContext2D> {
 
   protected dprInit = createRefThrottle(() =>{
     const dpr = window.devicePixelRatio || 1;
-    this.canvas.style.width = this.width + "px";
-    this.canvas.style.height = this.height + "px";
-    this.canvas.width = this.width * dpr;
-    this.canvas.height = this.height * dpr;
-    // 使画布内容也跟着缩放
-    this.ctx.scale(dpr, dpr);
+    Promise.resolve().then(() => {
+      this.canvas.style.width = this.width + "px";
+      this.canvas.style.height = this.height + "px";
+      this.canvas.width = this.width * dpr;
+      this.canvas.height = this.height * dpr;
+      // 使画布内容也跟着缩放
+      this.ctx.scale(dpr, dpr);
+    });
   })
 }

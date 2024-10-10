@@ -319,3 +319,5 @@ const img = new QxCanvas.Graphics()
   .setRotation(45);
 
 app.stage.add(img);
+
+// app.resize(200, 200);
